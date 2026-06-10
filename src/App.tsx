@@ -25,7 +25,8 @@ import {
   Smartphone,
   Car,
   TrendingUp,
-  Cpu
+  Cpu,
+  Download
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
@@ -81,6 +82,12 @@ export default function App() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Sayan Live BI Reports Module State
+  const [selectedBiReport, setSelectedBiReport ] = useState<string>("customers");
+  const [biSearch, setBiSearch] = useState<string>("");
+  const [biResult, setBiResult] = useState<any>(null);
+  const [biLoading, setBiLoading] = useState<boolean>(false);
 
   // Discovery State for MSSQL
   const [discoveryData, setDiscoveryData] = useState<{
@@ -326,6 +333,37 @@ export default function App() {
       setQueryResult({ success: false, error: "امکان ارتباط با وب‌سرور مدیریت واسط برقرار نشد." });
     } finally {
       setQueryLoading(false);
+    }
+  };
+
+  const handleRunBiReport = async (reportKey: string) => {
+    setBiLoading(true);
+    setBiResult(null);
+    setSelectedBiReport(reportKey);
+    let queryText = "";
+    
+    if (reportKey === "customers") {
+      queryText = "SELECT TOP 100 CustomerCode AS [کد مشتری], CustomerName AS [نام مشتری/همکار], CurrentBalance AS [مانده ریالی], Phone AS [تلفن تماس] FROM tblCustomer WHERE CurrentBalance != 0 ORDER BY ABS(CurrentBalance) DESC;";
+    } else if (reportKey === "goods") {
+      queryText = "SELECT TOP 100 GoodsCode AS [کد کالا], GoodsName AS [نام کالا], SalePrice AS [قیمت واحد کالا], StockCount AS [موجودی], (SalePrice * StockCount) AS [ارزش تخمینی انبار] FROM tblGoods LEFT JOIN tblStock ON tblGoods.GoodsID = tblStock.GoodsID WHERE StockCount > 0 ORDER BY StockCount DESC;";
+    } else if (reportKey === "sales") {
+      queryText = "SELECT TOP 100 F.FactorNo AS [شماره فاکتور], F.FactorDate AS [تاریخ فاکتور], C.CustomerName AS [نام خریدار], F.TotalPrice AS [جمع کل ناخالص], F.FinalPrice AS [مبلغ نهایی فاکتور] FROM tblFactor F LEFT JOIN tblCustomer C ON F.CustomerID = C.CustomerID ORDER BY F.FactorNo DESC;";
+    } else if (reportKey === "accounting") {
+      queryText = "SELECT TOP 100 D.SanadNo AS [شماره سند], H.SanadDate AS [تاریخ سند], D.DebitAmount AS [بدهکار], D.CreditAmount AS [بستانکار], D.Description AS [شرح سند] FROM tblSanadDetail D LEFT JOIN tblSanadHeader H ON D.SanadID = H.SanadID ORDER BY H.SanadDate DESC, D.SanadNo DESC;";
+    }
+
+    try {
+      const res = await fetch("/api/gateway/query/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ queryText, forceRealConnection: true }) // Force live execution directly!
+      });
+      const data = await res.json();
+      setBiResult(data);
+    } catch (e) {
+      setBiResult({ success: false, error: "خطا در اتصال به درگاه واسط سایان. لطفاً مجدداً تلاش نمایید." });
+    } finally {
+      setBiLoading(false);
     }
   };
 
@@ -734,7 +772,7 @@ export default function App() {
             )}
 
 
-            {/* ======= TAB 2: QUERY CONSOLE  ======= */}
+            {/* ======= TAB 2: QUERY CONSOLE & BI REPORTS  ======= */}
             {activeTab === "playground" && (
               <motion.div
                 key="playground"
@@ -742,9 +780,427 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.2 }}
-                className="space-y-4"
+                className="space-y-6"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                
+                {/* 📊 داشبورد مستقل گزارشات مدیریتی و حقیقی سایان */}
+                <div className="bg-[#18181b] border border-[#27272a] rounded-xl p-5 space-y-4 shadow-sm" id="sayan-bi-dashboard">
+                  <div className="border-b border-[#27272a]/70 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse" />
+                        <h3 className="font-bold text-white text-xs sm:text-sm">
+                          📊 تحلیل‌گر هوشمند هوش تجاری و گزارشات مدیریتی واقعی سایان
+                        </h3>
+                      </div>
+                      <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
+                        با انتخاب هر یک از گزارشات حسابداری رسمی زیر، کوئری‌های بهینه به صورت زنده روی پایگاه‌داده فیزیکی سایان اجرا و تحلیل آماری کالاها، تراکنش‌ها یا مشتریان نمایش داده می‌شود.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 text-[10.5px]">
+                      {status.dbConnected ? (
+                        <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full font-medium flex items-center gap-1.5 shadow-sm">
+                          <Check className="w-3.5 h-3.5" />
+                          دیتابیس سایان زنده و متصل است
+                        </span>
+                      ) : (
+                        <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full font-medium flex items-center gap-1.5 shadow-sm">
+                          <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
+                          اجرا روی موتور شبیه‌ساز (آفلاین)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 4 Report Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    
+                    <button
+                      id="bi-btn-customers"
+                      onClick={() => handleRunBiReport("customers")}
+                      disabled={biLoading}
+                      className={`text-right p-4 rounded-xl border transition-all cursor-pointer ${
+                        selectedBiReport === "customers"
+                          ? "bg-blue-600/10 border-blue-500/60 shadow-lg text-white"
+                          : "bg-[#09090b] border-[#27272a] text-[#a1a1aa] hover:bg-[#1c1c1f] hover:border-[#3f3f46]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="p-2 rounded bg-blue-500/10 text-blue-400 font-bold">
+                          <UserCheck className="w-4 h-4 text-blue-500" />
+                        </span>
+                        <span className="text-[9px] font-semibold tracking-wider text-[#71717a] uppercase font-mono">
+                          tblCustomer
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-bold text-white mb-1">
+                        تراز بدهکاران و بستانکاران
+                      </h4>
+                      <p className="text-[10px] text-[#71717a] leading-relaxed">
+                        تراز جامع حساب مشتریان، شرکا و اشخاص دارای تراکنش مالی در سایان
+                      </p>
+                    </button>
+
+                    <button
+                      id="bi-btn-goods"
+                      onClick={() => handleRunBiReport("goods")}
+                      disabled={biLoading}
+                      className={`text-right p-4 rounded-xl border transition-all cursor-pointer ${
+                        selectedBiReport === "goods"
+                          ? "bg-blue-600/10 border-blue-500/60 shadow-lg text-white"
+                          : "bg-[#09090b] border-[#27272a] text-[#a1a1aa] hover:bg-[#1c1c1f] hover:border-[#3f3f46]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="p-2 rounded bg-blue-500/10 text-blue-400 font-bold">
+                          <Database className="w-4 h-4 text-blue-500" />
+                        </span>
+                        <span className="text-[9px] font-semibold tracking-wider text-[#71717a] uppercase font-mono">
+                          tblGoods / tblStock
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-bold text-white mb-1">
+                        موجودی و ارزش انبار
+                      </h4>
+                      <p className="text-[10px] text-[#71717a] leading-relaxed">
+                        ارزیابی فیزیکی موجودی انبار کالاها همراه با ارزش ریالی قیمت فروش کالا
+                      </p>
+                    </button>
+
+                    <button
+                      id="bi-btn-sales"
+                      onClick={() => handleRunBiReport("sales")}
+                      disabled={biLoading}
+                      className={`text-right p-4 rounded-xl border transition-all cursor-pointer ${
+                        selectedBiReport === "sales"
+                          ? "bg-blue-600/10 border-blue-500/60 shadow-lg text-white"
+                          : "bg-[#09090b] border-[#27272a] text-[#a1a1aa] hover:bg-[#1c1c1f] hover:border-[#3f3f46]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="p-2 rounded bg-blue-500/10 text-blue-400 font-bold">
+                          <TrendingUp className="w-4 h-4 text-blue-500" />
+                        </span>
+                        <span className="text-[9px] font-semibold tracking-wider text-[#71717a] uppercase font-mono">
+                          tblFactor / Invoices
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-bold text-white mb-1">
+                        ریز عملکرد فاکتورهای فروش
+                      </h4>
+                      <p className="text-[10px] text-[#71717a] leading-relaxed">
+                        مبالغ پورسانت، تخفیف فاکتورها، مالیات با ارزش‌افزوده و تفضیلی خریدار
+                      </p>
+                    </button>
+
+                    <button
+                      id="bi-btn-accounting"
+                      onClick={() => handleRunBiReport("accounting")}
+                      disabled={biLoading}
+                      className={`text-right p-4 rounded-xl border transition-all cursor-pointer ${
+                        selectedBiReport === "accounting"
+                          ? "bg-blue-600/10 border-blue-500/60 shadow-lg text-white"
+                          : "bg-[#09090b] border-[#27272a] text-[#a1a1aa] hover:bg-[#1c1c1f] hover:border-[#3f3f46]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="p-2 rounded bg-blue-500/10 text-blue-400 font-bold">
+                          <Activity className="w-4 h-4 text-blue-500" />
+                        </span>
+                        <span className="text-[9px] font-semibold tracking-wider text-[#71717a] uppercase font-mono">
+                          tblSanad / Accounting
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-bold text-white mb-1">
+                        دفتر کل اسناد حسابداری
+                      </h4>
+                      <p className="text-[10px] text-[#71717a] leading-relaxed">
+                        موازنه دو طرفه اسناد بدهکار و بستانکار ثبت شده در سیستم اسناد رسمی سایان
+                      </p>
+                    </button>
+
+                  </div>
+
+                  {/* Action Bar (Fetch & Parameter Filter) */}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#09090b] p-3 rounded-lg border border-[#27272a]">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-xs text-[#a1a1aa] font-medium font-mono bg-[#18181b] border border-[#27272a] px-2.5 py-1 rounded">
+                        گزارش انتخابی: {
+                          selectedBiReport === "customers" ? "تراز معین اشخاص" :
+                          selectedBiReport === "goods" ? "کاردکس موجودی کالا" :
+                          selectedBiReport === "sales" ? "فاکتورهای فروش اخیر" : "دفتر روزنامه اسناد مالی"
+                        }
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto self-end">
+                      <button
+                        id="bi-fetch-btn"
+                        onClick={() => handleRunBiReport(selectedBiReport)}
+                        disabled={biLoading}
+                        className="w-full sm:w-auto px-5 py-2 hover:opacity-90 disabled:opacity-50 text-[11px] font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                      >
+                        {biLoading ? (
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Play className="w-3.5 h-3.5 fill-white text-white" />
+                        )}
+                        <span>واکشی مستقیم از دیتابیس سایان (Real Run)</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* BI Result Display Grid */}
+                  <div className="space-y-4 pt-1">
+                    
+                    {biLoading && (
+                      <div className="text-[#a1a1aa] text-center bg-[#09090b] rounded-lg p-16 border border-[#27272a] flex flex-col items-center justify-center gap-3">
+                        <RefreshCw className="w-6 h-6 animate-spin text-blue-500" />
+                        <span className="font-bold text-white text-xs">اتصال همزمان کابل دیتابیس به سایان...</span>
+                        <p className="text-[10.5px] text-[#71717a] max-w-md leading-relaxed">
+                          سیستم با دستور مستقیم SQL در حال فراخوانی اطلاعات از جداول محلی سیستم حسابداری شما با دور زدن لایه‌های شبیه‌ساز است. لطفاً شکیبا باشید.
+                        </p>
+                      </div>
+                    )}
+
+                    {!biLoading && !biResult && (
+                      <div className="text-center py-10 bg-[#09090b] rounded-lg border border-[#27272a] text-[#71717a] space-y-1">
+                        <Database className="w-7 h-7 text-[#27272a] mx-auto mb-2" />
+                        <span className="text-xs font-bold block text-[#a1a1aa]">درخواست آماده ارسال به دیتابیس اصلی سایان است.</span>
+                        <p className="text-[11px] text-[#71717a]">روی دکمه آبی رنگ «واکشی مستقیم از دیتابیس سایان» کلیک کنید تا پاسخ حقیقی واکشی شود.</p>
+                      </div>
+                    )}
+
+                    {!biLoading && biResult && biResult.success === false && (
+                      <div className="p-4 bg-rose-500/5 hover:bg-rose-500/[0.08] rounded-xl border border-rose-500/20 text-rose-300 space-y-3" dir="rtl">
+                        <div className="flex items-start gap-2.5">
+                          <XCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                          <div className="space-y-1">
+                            <span className="font-bold flex items-center gap-1 text-xs text-rose-400">
+                              خطای پایگاه داده زنده سایان (LIVE DBMS Connection Refused)
+                            </span>
+                            <p className="text-[11px] leading-relaxed text-[#a1a1aa]">
+                              پایگاه داده زنده مایکروسافت SQL سرور سایان نتوانست درخواست شما را پردازش کند. متن خطای سیستمی زیر را جهت عیب‌یابی مشاهده فرمایید:
+                            </p>
+                          </div>
+                        </div>
+
+                        <pre className="p-3 bg-[#09090b] rounded border border-rose-950/40 text-[10.5px] text-rose-300 leading-relaxed overflow-x-auto whitespace-pre-wrap font-mono">
+                          {biResult.error}
+                        </pre>
+
+                        <div className="bg-rose-500/10 p-3 rounded-lg border border-rose-500/10 text-[10.5px] text-rose-300/90 leading-relaxed md:grid md:grid-cols-2 md:gap-4 space-y-2 md:space-y-0 font-medium">
+                          <div className="space-y-1">
+                            <p className="font-bold text-[#e4e4e7]">🔍 چرا این خطا رخ داد؟</p>
+                            <ul className="list-disc list-inside space-y-1 text-[#a1a1aa] text-[10px]">
+                              <li>احتمالاً فایروال سیستم/سرور کلاینت پورت ۱۴۳۳ را مسدود کرده است.</li>
+                              <li>مشخصات دیتابیس یا پسورد وارد شده در تب «تنظیمات سرور» نادرست است.</li>
+                              <li>جدول یا نام ستون‌های اصلی دیتابیس با نسخه سایان شما تفاوت ساختاری دارد.</li>
+                            </ul>
+                          </div>
+
+                          <div className="space-y-1">
+                            <p className="font-bold text-[#e4e4e7]">🔧 راه‌حل اضطراری عیب‌یابی:</p>
+                            <ul className="list-disc list-inside space-y-1 text-[#a1a1aa] text-[10px]">
+                              <li>از زبانه <strong className="text-blue-400">«تنظیمات سرور»</strong> آی‌پی یا نام وب‌سایت لوکال و پورت را دقیقاً فیکس مجدد کنید.</li>
+                              <li>اطمینان حاصل کنید دسترسی یوزر <code className="bg-[#09090b] px-1 text-amber-200 text-[10px]">sa</code> یا مشابه فعال است.</li>
+                              <li>از زبانه پایین (کنسول توسعه آزاد) برای تست کوئری دلخواه استفاده کنید.</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {!biLoading && biResult && biResult.success && (
+                      <div className="space-y-4">
+                        
+                        {/* Summary metrics header of returned rows */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#09090b] p-3 rounded-lg border border-[#27272a]">
+                          <div className="flex items-center gap-3">
+                            <div className="text-xs font-semibold text-[#a1a1aa]">
+                              نتایج واکشی شده: <span className="text-emerald-400 font-bold font-mono pl-1">{biResult.rows?.length || 0} ردیف داده معتبر</span>
+                            </div>
+                            <div className="text-[10px] text-[#71717a] font-mono border-r border-[#27272a] pr-3">
+                              زمان پردازش: {biResult.responseTime}ms | سورس: {
+                                biResult.source === 'sql-direct' ? "اتصال مستقیم MS SQL سایان" : "شبیه‌ساز آفلاین"
+                              }
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {/* Search Client-side */}
+                            <div className="relative">
+                              <input
+                                type="text"
+                                placeholder="جستجوی سریع بین رادیف‌ها..."
+                                value={biSearch}
+                                onChange={(e) => setBiSearch(e.target.value)}
+                                className="bg-[#18181b] text-white text-[10px] px-3 py-1.5 rounded border border-[#27272a] focus:border-blue-500 outline-none w-48 pr-7 text-right"
+                              />
+                              <Search className="w-3 h-3 text-[#71717a] absolute right-2.5 top-2.5" />
+                            </div>
+
+                            {/* Export Buttons */}
+                            <button
+                              id="excel-csv-export-btn"
+                              onClick={() => {
+                                if (!biResult.rows || biResult.rows.length === 0) return;
+                                const headers = Object.keys(biResult.rows[0]);
+                                const csvContent = "data:text/csv;charset=utf-8,\ufeff" 
+                                  + [headers.join(",")].concat(
+                                      biResult.rows.map((row: any) => 
+                                        headers.map(h => `"${String(row[h] !== null ? row[h] : '').replace(/"/g, '""')}"`).join(",")
+                                      )
+                                    ).join("\n");
+                                const encodedUri = encodeURI(csvContent);
+                                const link = document.createElement("a");
+                                link.setAttribute("href", encodedUri);
+                                link.setAttribute("download", `Sayan_${selectedBiReport}_Report_${new Date().toISOString().slice(0,10)}.csv`);
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                              }}
+                              className="px-2.5 py-1.5 bg-[#18181b] hover:bg-[#27272a] border border-[#27272a] rounded text-[10px] font-semibold text-[#e4e4e7] cursor-pointer flex items-center gap-1 transition-colors"
+                              title="دانلود گزارش به فرمت اکسل CSV"
+                            >
+                              <Download className="w-3.5 h-3.5 text-blue-400" />
+                              <span>اکسل (CSV)</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Interactive Visual Graph & Table Layout Grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                          
+                          {/* 1. Left Graphic Column (Visual Bars) */}
+                          <div className="lg:col-span-1">
+                            {(() => {
+                              const rows = biResult.rows || [];
+                              const chartItems = rows
+                                .map((row: any) => {
+                                  // Find label values
+                                  const label = row["نام مشتری/همکار"] || row["نام شخص"] || row["نام کالا"] || row["نام خریدار"] || row["شرح سند"] || Object.values(row)[1] || "Unknown";
+                                  // Find key numeric column
+                                  const rawVal = row["مانده ریالی"] || row["موجودی"] || row["ارزش تخمینی انبار"] || row["مبلغ نهایی فاکتور"] || row["جمع کل ناخالص"] || row["بدهکار"] || row["بستانکار"] || Object.values(row).find(v => typeof v === "number") || 0;
+                                  return { label: String(label), value: Math.abs(Number(rawVal)) };
+                                })
+                                .filter((item: any) => item.value > 0)
+                                .slice(0, 8); // top 8 to visualize
+
+                              const maxVal = Math.max(...chartItems.map((i: any) => i.value), 1);
+
+                              if (chartItems.length === 0) {
+                                return (
+                                  <div className="bg-[#09090b] border border-[#27272a] rounded-xl p-4 text-center text-[#71717a] text-[10.5px] h-full flex items-center justify-center min-h-[150px]">
+                                    برای این نوع گزارش، نمودار توزیعی ارقام به دلیل عدم وجود ردیف های عددی بزرگتر از صفر برقرار نشد.
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <div className="bg-[#09090b] border border-[#27272a] rounded-xl p-4 space-y-4">
+                                  <div className="space-y-0.5">
+                                    <span className="text-[11px] font-bold text-white block">📊 نمودار زنده اقلام برتر فیزیکی</span>
+                                    <span className="text-[9.5px] text-[#71717a]">تحلیل سهم مادی بزرگترین رکوردهای دریافتی از دیتابیس سایان</span>
+                                  </div>
+
+                                  <div className="space-y-3.5 pt-1">
+                                    {chartItems.map((item: any, idx: number) => {
+                                      const percent = Math.min(100, Math.round((item.value / maxVal) * 100));
+                                      return (
+                                        <div key={idx} className="space-y-1">
+                                          <div className="flex justify-between items-center text-[10px] gap-1.5">
+                                            <span className="text-[#e4e4e7] truncate max-w-[120px]" title={item.label}>{item.label}</span>
+                                            <span className="text-emerald-400 font-mono font-bold shrink-0">{item.value.toLocaleString("fa-IR")}</span>
+                                          </div>
+                                          <div className="w-full bg-[#18181b] h-2 rounded-full overflow-hidden border border-[#27272a]/80">
+                                            <div 
+                                              className="bg-gradient-to-r from-blue-600 via-sky-500 to-emerald-400 h-full rounded-full transition-all duration-700"
+                                              style={{ width: `${percent}%` }}
+                                            />
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+
+                          {/* 2. Right Data Grid Table (Zebra Rows) */}
+                          <div className="lg:col-span-2">
+                            <div className="bg-[#09090b] rounded-xl border border-[#27272a] overflow-hidden">
+                              {(() => {
+                                // Filter based on client state
+                                const rawRows = biResult.rows || [];
+                                const filtered = rawRows.filter((row: any) => {
+                                  if (!biSearch) return true;
+                                  return Object.values(row).some(
+                                    v => String(v !== null ? v : '').toLowerCase().includes(biSearch.toLowerCase())
+                                  );
+                                });
+
+                                if (filtered.length === 0) {
+                                  return (
+                                    <div className="text-[#a1a1aa] text-center py-20 text-[11px]">
+                                      رکوردی سازگار با عبارت جستجوی «<span className="text-blue-400">{biSearch}</span>» یافت نشد.
+                                    </div>
+                                  );
+                                }
+
+                                const headers = Object.keys(filtered[0] || {});
+
+                                return (
+                                  <div className="overflow-auto max-h-[360px]" dir="rtl">
+                                    <table className="w-full text-right text-[11px] border-collapse">
+                                      <thead className="bg-[#1c1c1f] text-[#a1a1aa] border-b border-[#27272a] sticky top-0">
+                                        <tr>
+                                          {headers.map((h, idx) => (
+                                            <th key={idx} className="p-3 font-semibold text-[#a1a1aa] whitespace-nowrap">{h}</th>
+                                          ))}
+                                        </tr>
+                                      </thead>
+                                      <tbody className="divide-y divide-[#27272a] font-mono">
+                                        {filtered.map((row: any, rIdx: number) => (
+                                          <tr key={rIdx} className="hover:bg-[#18181b] transition-colors/20">
+                                            {headers.map((h, cIdx) => {
+                                              const rawVal = row[h];
+                                              const isNum = typeof rawVal === "number" && h.toLowerCase() !== "code" && !h.endsWith("کد");
+                                              
+                                              return (
+                                                <td key={cIdx} className={`p-3 text-[11px] ${isNum ? 'text-emerald-400 font-bold' : 'text-[#e4e4e7]'}`}>
+                                                  {rawVal === null || rawVal === undefined 
+                                                    ? <span className="text-[#71717a]">-</span> 
+                                                    : isNum 
+                                                      ? rawVal.toLocaleString("fa-IR") + (h.includes("ریال") || h.includes("قیمت") || h.includes("مانده") ? " ریال" : "")
+                                                      : String(rawVal)
+                                                  }
+                                                </td>
+                                              );
+                                            })}
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          </div>
+
+                        </div>
+
+                      </div>
+                    )}
+
+                  </div>
+
+                </div>
+
+                {/* 💻 کنسول توسعه آزاد کوئری‌های تعاملی بالا */}
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4" id="developer-sql-playground">
                   
                   {/* Left panel: Catalog of Sayan Tables or SQL Discovery */}
                   <div className="lg:col-span-1 bg-[#18181b] border border-[#27272a] rounded-xl p-4 space-y-4">
