@@ -1,0 +1,3491 @@
+[
+  {
+    "name": "Sayan / Account / Token",
+    "method": "POST",
+    "url": "/Account/Token",
+    "description": "<p>اولین گام در پیاده سازی وب سرویس سایان، دریافت توکن است. توکنی که در پاسخ دریافت میکنید باید همراه با تمامی ریکوئست های بعدی ارسال شود</p>\n<p>نکته: فراخوانی این متد حکم ورود به حساب کاربری را دارد</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "grant_type",
+          "value": "password",
+          "type": "text"
+        },
+        {
+          "key": "username",
+          "value": "admin@mail.com",
+          "type": "text",
+          "description": "<p>User must be created in Sayan win based app</p>\n"
+        },
+        {
+          "key": "password",
+          "value": "123456",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Area / New - parentId",
+    "method": "GET",
+    "url": "/api/Area/New",
+    "description": "<p>با ارسال شناسه والد، اطلاعات پیشنهادی و مورد نیاز برای ثبت یک استان یا شهر توسط متد پست، در خروجی این متد برمیگردد</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "formdata",
+      "formdata": []
+    }
+  },
+  {
+    "name": "Sayan / Area / New - parentCode",
+    "method": "GET",
+    "url": "/api/Area/New",
+    "description": "<p>با ارسال کد والد، اطلاعات پیشنهادی و مورد نیاز برای ثبت یک استان یا شهر توسط متد پست، در خروجی این متد برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Area / Area - parentId",
+    "method": "GET",
+    "url": "/api/Area",
+    "description": "<p>اطلاعات شهرهای یک استان را با دریافت شناسه آن استان (شناسه والد) برمیگرداند</p>\n<p>اگر مقدار شناسه والد نال ارسال شود آرایه ای از استان ها برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Area / Area - parentCode",
+    "method": "GET",
+    "url": "/api/Area",
+    "description": "<p>اطلاعات شهرهای یک استان را با دریافت کد آن استان (کد والد) برمیگرداند</p>\n<p>اگر مقدار کد والد نال ارسال شود آرایه ای از استان ها برمیگردد</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": []
+    }
+  },
+  {
+    "name": "Sayan / Area / Area - id",
+    "method": "GET",
+    "url": "/api/Area",
+    "description": "<p>اطلاعات یک استان یا شهر را با ارسال شناسه آن برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Area / Area - code",
+    "method": "GET",
+    "url": "/api/Area",
+    "description": "<p>اطلاعات یک استان یا شهر را با ارسال کد آن برمیگرداند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": []
+    }
+  },
+  {
+    "name": "Sayan / Area / Area",
+    "method": "POST",
+    "url": "/api/Area",
+    "description": "<p>با استفاده از اطلاعات پیشنهادی دریافت شده از متد زیر، میتوانید با ارسال این ریکوئست یک استان یا شهر ثبت کنید</p>\n<p><code>New</code></p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "ParentCode",
+          "value": "",
+          "description": "<p>string - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "SubCode",
+          "value": "",
+          "description": "<p>string - Required - Matching regular expression pattern: ^[0-9]*</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Title",
+          "value": "",
+          "description": "<p>string - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "CountryCode",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "AreaType",
+          "value": "",
+          "description": "<p>Province(1), City(2)-Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "PerCityCode",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Area / Area",
+    "method": "PUT",
+    "url": "/api/Area",
+    "description": "<p>برای ویرایش اطلاعات یک استان یا شهر میتوانید از این متد استفاده کنید</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Id",
+          "value": "1",
+          "description": "<p>long- Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Title",
+          "value": "تهران",
+          "description": "<p>string - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "CountryCode",
+          "value": "9800000",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "AreaType",
+          "value": "1",
+          "description": "<p>Province(1), City(2)-Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "PerCityCode",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Area / Area - id",
+    "method": "DELETE",
+    "url": "/api/Area",
+    "description": "<p>با ارسال شناسه استان یا شهر، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Area / Area - code",
+    "method": "DELETE",
+    "url": "/api/Area",
+    "description": "<p>با ارسال کد استان یا شهر، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Ware / New - parentId",
+    "method": "GET",
+    "url": "/api/Ware/New",
+    "description": "<p>با ارسال شناسه والد، اطلاعات پیشنهادی و مورد نیاز برای ثبت یک کالا یا گروه کالایی در آن گروه والد توسط متد پست، در خروجی این متد برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Ware / New - parentCode",
+    "method": "GET",
+    "url": "/api/Ware/New",
+    "description": "<p>با ارسال کد والد، اطلاعات پیشنهادی و مورد نیاز برای ثبت یک کالا یا گروه کالایی در آن گروه والد توسط متد پست، در خروجی این متد برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Ware / Ware - parentId",
+    "method": "GET",
+    "url": "/api/Ware",
+    "description": "<p>با ارسال شناسه والد یک کالا یا گروه کالایی، کالاها و گروه های زیرمجموعه آن برمیگردد. برای دریافت کالاها و گروه های ریشه، مقدار شناسه والد را نال ارسال کنید</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Ware / Ware - parentCode",
+    "method": "GET",
+    "url": "/api/Ware",
+    "description": "<p>با ارسال کد والد یک کالا یا گروه کالایی، کالاها و گروه های زیرمجموعه آن برمیگردد. برای دریافت کالاها و گروه های ریشه، مقدار کد والد را نال ارسال کنید</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Ware / Ware - id",
+    "method": "GET",
+    "url": "/api/Ware",
+    "description": "<p>با ارسال شناسه یک کالا یا گروه کالایی، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Ware / Ware - code",
+    "method": "GET",
+    "url": "/api/Ware",
+    "description": "<p>با ارسال کد یک کالا یا گروه کالایی، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "formdata",
+      "formdata": []
+    }
+  },
+  {
+    "name": "Sayan / Ware / Ware",
+    "method": "POST",
+    "url": "/api/Ware",
+    "description": "<p>StartFragment</p>\n<p>با استفاده از اطلاعات پیشنهادی دریافت شده از متد زیر، میتوانید با ارسال این ریکوئست یک کالا یا گروه کالایی ثبت کنید</p>\n<p><code>New</code></p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "ParentCode",
+          "value": "null",
+          "description": "<p>string - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "SubCode",
+          "value": "1145",
+          "description": "<p>string - Required - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsGroup",
+          "value": "true",
+          "description": "<p>boolean - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Title",
+          "value": "تست",
+          "description": "<p>string - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "UnitCode",
+          "value": "12",
+          "description": "<p>string - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsEnable",
+          "value": "true",
+          "description": "<p>boolean - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[0].ParameterId",
+          "value": "1",
+          "description": "<p>Collection of ParameterValueVm</p>\n",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[0].Value",
+          "value": "50",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].ParameterId",
+          "value": "2",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].Value",
+          "value": "90",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[2].ParameterId",
+          "value": "3",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[2].Value",
+          "value": "گلاسه",
+          "type": "text",
+          "disabled": true
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Ware / Ware",
+    "method": "PUT",
+    "url": "/api/Ware",
+    "description": "<p>این متد اطلاعات کالا یا گروه کالایی را ویرایش میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "id",
+          "value": "10",
+          "description": "<p>long</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsGroup",
+          "value": "true",
+          "description": "<p>boolean - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Title",
+          "value": "مداد",
+          "description": "<p>string - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "UnitCode",
+          "value": "11",
+          "description": "<p>string - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsEnable",
+          "value": "true",
+          "description": "<p>boolean - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "مداد رنگی!",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues",
+          "value": "",
+          "description": "<p>Collection of ParameterValueVm</p>\n",
+          "type": "text",
+          "disabled": true
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Ware / Ware - id",
+    "method": "DELETE",
+    "url": "/api/Ware",
+    "description": "<p>StartFragment</p>\n<p>با ارسال شناسه کالا یا گروه کالایی، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "formdata",
+      "formdata": []
+    }
+  },
+  {
+    "name": "Sayan / Ware / Ware - code",
+    "method": "DELETE",
+    "url": "/api/Ware",
+    "description": "<p>با ارسال کد کالا یا گروه کالایی، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "formdata",
+      "formdata": []
+    }
+  },
+  {
+    "name": "Sayan / Ware / SetPicture",
+    "method": "POST",
+    "url": "/api/Ware/SetPicture",
+    "description": "<p>تصویری که بصورت بیس64 ارسال میشود را بعنوان تصویر کالا یا گروه کالایی درج میکند.</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Base64EncodedData",
+          "value": "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",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Ware / GetPicture",
+    "method": "GET",
+    "url": "/api/Ware/GetPicture",
+    "description": "<p>تصویر کالا یا گروه کالایی را بصورت بیس64 برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Ware / Stock",
+    "method": "GET",
+    "url": "/api/Ware/Stock",
+    "description": "<p>موجودی کالا را در انبار تعیین شده (بدون قیمت) برمیگرداند. برای دریافت موجودی به همراه قیمت باید از متد زیر استفاده کنید</p>\n<p><code>Inventory</code></p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": []
+    }
+  },
+  {
+    "name": "Sayan / Ware / WareUnits",
+    "method": "GET",
+    "url": "/api/Ware/WareUnits",
+    "description": "<p>واحدهای تعریف شده روی یک کالا را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrProceeding / StrProceeding - systemCode",
+    "method": "GET",
+    "url": "/api/StrProceeding",
+    "description": "<p>عملیات های سیستم تعیین شده را برمیگرداند</p>\n<p><strong>نکته:</strong> خرید و فروش، دریافت سفارشات، انبار و ... نمونه هایی از سیستم هستند. هر سیستم دارای کد یکتا می باشد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrProceeding / StrProceeding - id",
+    "method": "GET",
+    "url": "/api/StrProceeding",
+    "description": "<p>با ارسال شناسه عملیات، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrProceeding / StrProceeding - code",
+    "method": "GET",
+    "url": "/api/StrProceeding",
+    "description": "<p>با ارسال کد عملیات، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrProceeding / Record",
+    "method": "GET",
+    "url": "/api/StrProceeding/Record",
+    "description": "<p>آرایه ای از همه عملیات ها با اطلاعات خلاصه و غیر کامل برمیگرداند.</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrProceeding / Issuable",
+    "method": "GET",
+    "url": "/api/StrProceeding/Issuable",
+    "description": "<p>با ارسال نوع کلاینت، با توجه به دسترسی کلاینت به عملیات ها، آرایه ای از عملیات ها را که توسط کلاینت قابل صدور هستند برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / New",
+    "method": "GET",
+    "url": "/api/StrVoucher/New",
+    "description": "<p>اطلاعات پیشنهادی و مورد نیاز برای ثبت سند توسط متد پست، در خروجی این متد برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / StrVoucher",
+    "method": "GET",
+    "url": "/api/StrVoucher",
+    "description": "<p>مطابق با اطلاعات ارسال شده در ورودی، آرایه ای از اسناد انبار، خرید و فروش، دریافت سفارشات و تولید برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / StrVoucher - id",
+    "method": "GET",
+    "url": "/api/StrVoucher",
+    "description": "<p>با ارسال شناسه سند، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / StrVoucher",
+    "method": "POST",
+    "url": "/api/StrVoucher",
+    "description": "<p>با استفاده از اطلاعات پیشنهادی دریافت شده از متد زیر، میتوانید با ارسال این ریکوئست یک سند ثبت کنید</p>\n<p><code>New</code></p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "ArchiveCode",
+          "value": "6",
+          "type": "text",
+          "description": "<p>long - Required</p>\n"
+        },
+        {
+          "key": "SerialCode",
+          "value": "2",
+          "type": "text",
+          "description": "<p>long</p>\n"
+        },
+        {
+          "key": "Date",
+          "value": "2022-08-29 14:24:01",
+          "type": "text",
+          "description": "<p>date - Required</p>\n"
+        },
+        {
+          "key": "ProceedingCode",
+          "value": "14",
+          "type": "text",
+          "description": "<p>string - Required Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "Description",
+          "value": "ثبت از طریق پستمن",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "PaymentMode",
+          "value": "0",
+          "type": "text",
+          "description": "<p>NoSettling(0), InCash(1), DepositIntoAccount(2), OtherSettlement(3), Hybrid(4)</p>\n"
+        },
+        {
+          "key": "BankCode",
+          "value": "1100010007",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "CashCode",
+          "value": "1100050001",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "CashPay",
+          "value": "50000.0",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^([1-9]\\d{0,17}|0)(.\\d{0,18}|)$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "BankPay",
+          "value": "5000.0",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^([1-9]\\d{0,17}|0)(.\\d{0,18}|)$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "NoPay",
+          "value": "95000.0",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^([1-9]\\d{0,17}|0)(.\\d{0,18}|)$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].WareCode",
+          "value": "1110031001",
+          "type": "text",
+          "description": "<p>string- Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "Records[0].SumPrice",
+          "value": "15000000.0",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^([1-9]\\d{0,17}|0)(.\\d{0,18}|)$</p>\n"
+        },
+        {
+          "key": "Records[0].BaseIdentity",
+          "value": "108",
+          "type": "text",
+          "description": "<p>long</p>\n"
+        },
+        {
+          "key": "Records[0].Description",
+          "value": "ثبت رکورد از طریق پستمن",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].PrimeryQuantity",
+          "value": "3.0",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^\\d{0,18}(.\\d{0,4}|)$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].UnitId",
+          "value": "1",
+          "type": "text",
+          "description": "<p>long</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].Quantity",
+          "value": "3.0",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^\\d{0,18}(.\\d{0,4}|)$</p>\n"
+        },
+        {
+          "key": "Records[0].ParameterValues[0].ParameterId",
+          "value": "62",
+          "type": "text",
+          "description": "<p>long - Required</p>\n"
+        },
+        {
+          "key": "Records[0].ParameterValues[0].Value",
+          "value": "0601/1/2",
+          "type": "text",
+          "description": "<p>string - Required</p>\n"
+        },
+        {
+          "key": "Records[0].ParameterValues[1].ParameterId",
+          "value": "63",
+          "type": "text",
+          "description": "<p>Collection of AggregateBaseRecordVm</p>\n"
+        },
+        {
+          "key": "Records[0].ParameterValues[1].Value",
+          "value": "141001",
+          "type": "text",
+          "description": "<p>string - Required</p>\n"
+        },
+        {
+          "key": "Records[0].ParameterValues[2].ParameterId",
+          "value": "88",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].ParameterValues[2].Value",
+          "value": "دلار",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].ParameterValues[3].ParameterId",
+          "value": "89",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].ParameterValues[3].Value",
+          "value": "100",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].ParameterValues[4].ParameterId",
+          "value": "90",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].ParameterValues[4].Value",
+          "value": "25000",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[0].ParameterId",
+          "value": "67",
+          "type": "text",
+          "description": "<p>long - Required</p>\n"
+        },
+        {
+          "key": "ParameterValues[0].Value",
+          "value": "131001",
+          "type": "text",
+          "description": "<p>string - Required</p>\n"
+        },
+        {
+          "key": "ParameterValues[1].ParameterId",
+          "value": "71",
+          "type": "text",
+          "description": "<p>long - Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].Value",
+          "value": "11",
+          "type": "text",
+          "description": "<p>string - Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].PriceListCode",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / StrVoucher / StrVoucher",
+    "method": "PUT",
+    "url": "/api/StrVoucher",
+    "description": "<p>اطلاعات سند را ویرایش میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "id",
+          "value": "139477",
+          "type": "text",
+          "description": "<p>long - Required</p>\n"
+        },
+        {
+          "key": "PeriodCode",
+          "value": "3",
+          "type": "text",
+          "description": "<p>long - Required</p>\n"
+        },
+        {
+          "key": "ArchiveCode",
+          "value": "44210",
+          "type": "text",
+          "description": "<p>long - Required</p>\n"
+        },
+        {
+          "key": "SerialCode",
+          "value": "6607",
+          "type": "text",
+          "description": "<p>long</p>\n"
+        },
+        {
+          "key": "Date",
+          "value": "2022-10-09T09:16:15",
+          "type": "text",
+          "description": "<p>date - Required</p>\n"
+        },
+        {
+          "key": "ProceedingCode",
+          "value": "50",
+          "type": "text",
+          "description": "<p>string - Required Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "Description",
+          "value": "ثبت از طریق پستمن",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "PaymentMode",
+          "value": "0",
+          "type": "text",
+          "description": "<p>NoSettling(0), InCash(1), DepositIntoAccount(2), OtherSettlement(3), Hybrid(4)</p>\n"
+        },
+        {
+          "key": "BankCode",
+          "value": "1100010007",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "CashCode",
+          "value": "1100010003",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "CashPay",
+          "value": "50000.0",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^([1-9]\\d{0,17}|0)(.\\d{0,18}|)$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "BankPay",
+          "value": "5000.0",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^([1-9]\\d{0,17}|0)(.\\d{0,18}|)$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "NoPay",
+          "value": "3239540.0000",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^([1-9]\\d{0,17}|0)(.\\d{0,18}|)$</p>\n"
+        },
+        {
+          "key": "Records[0].Id",
+          "value": "482675",
+          "type": "text",
+          "description": "<p>long - Required</p>\n"
+        },
+        {
+          "key": "Records[0].WareCode",
+          "value": "110101041001",
+          "type": "text",
+          "description": "<p>string- Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "Records[0].SumPrice",
+          "value": "460000.0000",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^([1-9]\\d{0,17}|0)(.\\d{0,18}|)$</p>\n"
+        },
+        {
+          "key": "Records[0].BaseIdentity",
+          "value": "51569",
+          "type": "text",
+          "description": "<p>long</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].Description",
+          "value": "ثبت رکورد از طریق پستمن",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].PrimeryQuantity",
+          "value": "1.0",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^\\d{0,18}(.\\d{0,4}|)$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].UnitId",
+          "value": "1",
+          "type": "text",
+          "description": "<p>long</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].Quantity",
+          "value": "1.0",
+          "type": "text",
+          "description": "<p>decimal number - Matching regular expression pattern: ^\\d{0,18}(.\\d{0,4}|)$</p>\n"
+        },
+        {
+          "key": "Records[0].ParameterValues[0].ParameterId",
+          "value": "30",
+          "type": "text",
+          "description": "<p>long - Required</p>\n"
+        },
+        {
+          "key": "Records[0].ParameterValues[0].Value",
+          "value": "60000",
+          "type": "text",
+          "description": "<p>string - Required</p>\n"
+        },
+        {
+          "key": "Records[0].ParameterValues[1].ParameterId",
+          "value": "248",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].ParameterValues[1].Value",
+          "value": "10",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[0].ParameterId",
+          "value": "25",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[0].Value",
+          "value": "حضوری",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[1].ParameterId",
+          "value": "26",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[1].Value",
+          "value": "2022-10-11T00:00:00Z",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[2].ParameterId",
+          "value": "27",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[2].Value",
+          "value": "کرج در سبزه",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[3].ParameterId",
+          "value": "28",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[3].Value",
+          "value": "1013",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[4].ParameterId",
+          "value": "29",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[4].Value",
+          "value": "سند توضیحات نداره",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[5].ParameterId",
+          "value": "182",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[5].Value",
+          "value": "11",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[6].ParameterId",
+          "value": "441",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[6].Value",
+          "value": "1000",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[7].ParameterId",
+          "value": "498",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[7].Value",
+          "value": "250000",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].PriceListCode",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / StrVoucher / StrVoucher",
+    "method": "DELETE",
+    "url": "/api/StrVoucher",
+    "description": "<p>با ارسال شناسه سند، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / Ware - proceedingCode",
+    "method": "GET",
+    "url": "/api/StrVoucher/Ware",
+    "description": "<p>کالاهای تخصیص داده شده به یک عملیات را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / Ware - storeCode",
+    "method": "GET",
+    "url": "/api/StrVoucher/Ware",
+    "description": "<p>کالاهای انبار تعیین شده را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / Base",
+    "method": "GET",
+    "url": "/api/StrVoucher/Base",
+    "description": "<p>آرایه ای از مبناهای یک عملیات برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / Inventory",
+    "method": "GET",
+    "url": "/api/StrVoucher/Inventory",
+    "description": "<p>StartFragment</p>\n<p>موجودی و قیمت کالاها را در انبار و با توجه به لیست قیمت تعیین شده برمیگرداند. اگر به قیمت کالاها احتیاج ندارید از متد زیر استفاده کنید</p>\n<p><code>Stock</code></p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / BarcodePattern",
+    "method": "GET",
+    "url": "/api/StrVoucher/BarcodePattern",
+    "description": "<p>الگوی تعریف شده برای بارکد در عملیات تعیین شده را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / Quantity",
+    "method": "POST",
+    "url": "/api/StrVoucher/Calc/Quantity",
+    "description": "<p>نتیجه محاسبه فرمول مقدار را برمیگرداند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Line",
+          "value": "1",
+          "type": "text",
+          "description": "<p>integer</p>\n"
+        },
+        {
+          "key": "ArchiveCode",
+          "value": "",
+          "type": "text",
+          "description": "<p>long</p>\n"
+        },
+        {
+          "key": "Date",
+          "value": "",
+          "type": "text",
+          "description": "<p>date</p>\n"
+        },
+        {
+          "key": "WareCode",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "SumPrice",
+          "value": "",
+          "type": "text",
+          "description": "<p>decimal number</p>\n"
+        },
+        {
+          "key": "Price",
+          "value": "",
+          "type": "text",
+          "description": "<p>decimal number</p>\n"
+        },
+        {
+          "key": "BaseIdentity",
+          "value": "",
+          "type": "text",
+          "description": "<p>long</p>\n"
+        },
+        {
+          "key": "ParameterValues[0].ParameterId",
+          "value": "",
+          "type": "text",
+          "description": "<p>long-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[0].Value",
+          "value": "",
+          "type": "text",
+          "description": "<p>string-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ParameterRecordValues[0].ParameterId",
+          "value": "",
+          "type": "text",
+          "description": "<p>long-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ParameterRecordValues[0].Value",
+          "value": "",
+          "type": "text",
+          "description": "<p>string-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "unitId",
+          "value": "",
+          "description": "<p>long</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / StrVoucher / ParameterValue",
+    "method": "POST",
+    "url": "/api/StrVoucher/Calc/ParameterValue",
+    "description": "<p>نتیجه محاسبه فرمول پارامتر تعیین شده از سند را برمیگرداند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "ArchiveCode",
+          "value": "202",
+          "type": "text",
+          "description": "<p>long</p>\n"
+        },
+        {
+          "key": "Date",
+          "value": "2021-12-15T14:09:26Z",
+          "type": "text",
+          "description": "<p>date</p>\n"
+        },
+        {
+          "key": "Records[0].WareCode",
+          "value": "11020100010031001",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "Records[0].SumPrice",
+          "value": "75000.0",
+          "type": "text",
+          "description": "<p>decimal number</p>\n"
+        },
+        {
+          "key": "Records[0].BaseIdentity",
+          "value": "",
+          "type": "text",
+          "description": "<p>long</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].Quantity",
+          "value": "15.0",
+          "type": "text",
+          "description": "<p>decimal number</p>\n"
+        },
+        {
+          "key": "Records[0].ParameterValues[0].ParameterId",
+          "value": "366",
+          "type": "text",
+          "description": "<p>string-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].ParameterValues[0].Value",
+          "value": "110101041006",
+          "type": "text",
+          "description": "<p>long-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].ParameterValues[1].ParameterId",
+          "value": "379",
+          "type": "text",
+          "description": "<p>string-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Records[0].ParameterValues[1].Value",
+          "value": "4",
+          "type": "text",
+          "description": "<p>long-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[0].ParameterId",
+          "value": "182",
+          "type": "text",
+          "description": "<p>string-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[0].Value",
+          "value": "11",
+          "type": "text",
+          "description": "<p>long-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].ParameterId",
+          "value": "383",
+          "type": "text",
+          "description": "<p>string-Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].Value",
+          "value": "2000",
+          "type": "text",
+          "disabled": true
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / StrVoucher / RecodParameterValue",
+    "method": "POST",
+    "url": "/api/StrVoucher/Calc/RecordParameterValue",
+    "description": "<p>نتیجه محاسبه فرمول پارامتر تعیین شده از ردیف را برمیگرداند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Line",
+          "value": "1",
+          "description": "<p>integer</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ArchiveCode",
+          "value": "11020100010087279",
+          "description": "<p>long</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Date",
+          "value": "2022-07-09 12:52:16",
+          "description": "<p>date</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "WareCode",
+          "value": "11020100010021001",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Price",
+          "value": "750000.0",
+          "type": "text"
+        },
+        {
+          "key": "SumPrice",
+          "value": "750000.0",
+          "description": "<p>decimal number</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "BaseIdentity",
+          "value": "",
+          "description": "<p>long</p>\n",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "Quantity",
+          "value": "1.0",
+          "description": "<p>decimal number</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[0].ParameterId",
+          "value": "28",
+          "description": "<p>long-Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[0].Value",
+          "value": "11",
+          "description": "<p>string-Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[1].ParameterId",
+          "value": "182",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[1].Value",
+          "value": "1000",
+          "type": "text"
+        },
+        {
+          "key": "ParameterRecordValues[0].ParameterId",
+          "value": "248",
+          "description": "<p>long-Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ParameterRecordValues[0].Value",
+          "value": "10",
+          "description": "<p>string-Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "unitId",
+          "value": "",
+          "description": "<p>long</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / StrVoucher / Bank",
+    "method": "GET",
+    "url": "/api/StrVoucher/Bank/",
+    "description": "<p>حساب های بانکی مرتبط با یک عملیات را برمیگرداند</p>\n<p>هرگاه تسویه از نوع \"واریز به حساب\" یا \"ترکیبی\" (در حالتی که مبلغ واریز به حساب بزرگتر از صفر است) باشد از این متد استفاده میشود</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / Cash",
+    "method": "GET",
+    "url": "/api/StrVoucher/Cash/",
+    "description": "<p>صندوق های مرتبط با یک عملیات را برمیگرداند</p>\n<p>هرگاه عملیات از نوع صندوق باشد، یا تسویه از نوع \"نقدی\" و یا \"ترکیبی\" (در حالتی که مبلغ نقدی بزرگتر از صفر است) باشد از این متد استفاده میشود</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / IsCashProceeding",
+    "method": "GET",
+    "url": "/api/StrVoucher/IsCashProceeding",
+    "description": "<p>این متد یک بولین برمیگرداند و مقدار خروجی آن تعیین کننده آن است که عملیات تعیین شده، از نوع صندوق است یا خیر</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / StrVoucher / RecordByRef",
+    "method": "GET",
+    "url": "/api/StrVoucher/RecordByRef",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / SubProceeding / SubProceeding - proceedingCode",
+    "method": "GET",
+    "url": "/api/SubProceeding",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / SubProceeding / SubProceeding - id",
+    "method": "GET",
+    "url": "/api/SubProceeding",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / BurProceeding / BurProceeding",
+    "method": "GET",
+    "url": "/api/BurProceeding",
+    "description": "<p>StartFragment</p>\n<p>آرایه ای از اسناد خزانه داری برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / BurProceeding / BurProceeding - id",
+    "method": "GET",
+    "url": "/api/BurProceeding",
+    "description": "<p>با ارسال شناسه عملیات، اطلاعات آن را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / BurProceeding / BurProceeding - code",
+    "method": "GET",
+    "url": "/api/BurProceeding",
+    "description": "<p>با ارسال کد عملیات، اطلاعات آن را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / BurProceeding / Issuable",
+    "method": "GET",
+    "url": "/api/BurProceeding/Issuable",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / BurProceeding / Record",
+    "method": "GET",
+    "url": "/api/BurProceeding/Record",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / BurVoucher / New",
+    "method": "GET",
+    "url": "/api/BurVoucher/New",
+    "description": "<p>اطلاعات پیشنهادی و مورد نیاز برای ثبت سند توسط متد پست، در خروجی این متد برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / BurVoucher / BurVoucher",
+    "method": "GET",
+    "url": "/api/BurVoucher",
+    "description": "<p>مطابق با اطلاعات ارسال شده در ورودی، آرایه ای از اسناد خزانه داری برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / BurVoucher / BurVoucher - id",
+    "method": "GET",
+    "url": "/api/BurVoucher",
+    "description": "<p>با ارسال شناسه سند، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / BurVoucher / BurVoucher",
+    "method": "POST",
+    "url": "/api/BurVoucher",
+    "description": "<p>با استفاده از اطلاعات پیشنهادی دریافت شده از متد زیر، میتوانید با ارسال این ریکوئست یک سند خزانه ثبت کنید</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "ArchiveCode",
+          "value": "14218",
+          "description": "<p>long - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "SerialCode",
+          "value": "49",
+          "description": "<p>long</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Date",
+          "value": "2022-12-26 14:49:49",
+          "description": "<p>date - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ProceedingCode",
+          "value": "49",
+          "description": "<p>string - Required - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Records",
+          "value": "",
+          "description": "<p>Collection of InsertBurRecordVm</p>\n",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues",
+          "value": "",
+          "description": "<p>Collection of ParameterValueVm</p>\n",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[0].parameterId",
+          "value": "85",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[0].value",
+          "value": "1",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[1].parameterId",
+          "value": "87",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[1].value",
+          "value": "111005",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[2].parameterId",
+          "value": "88",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[2].value",
+          "value": "کد فرعی",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].line",
+          "value": "1",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].price",
+          "value": "30000",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].factorCode",
+          "value": "11",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].ParameterValues[0].parameterId",
+          "value": "86",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].ParameterValues[0].value",
+          "value": "10005",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].detailValues[0].detailId",
+          "value": "14",
+          "type": "text"
+        },
+        {
+          "key": "Records[0].detailValues[0].value",
+          "value": "1100010004",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / BurVoucher / BurVoucher",
+    "method": "PUT",
+    "url": "/api/BurVoucher",
+    "description": "<p>اطلاعات سند خزانه را ویرایش میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Id",
+          "value": "",
+          "description": "<p>long - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "PeriodCode",
+          "value": "",
+          "description": "<p>long - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ArchiveCode",
+          "value": "",
+          "description": "<p>long - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "SerialCode",
+          "value": "",
+          "description": "<p>long</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Date",
+          "value": "",
+          "description": "<p>date - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ProceedingCode",
+          "value": "",
+          "description": "<p>string - Required - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Records",
+          "value": "",
+          "description": "<p>Collection of InsertBurRecordVm</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues",
+          "value": "",
+          "description": "<p>Collection of ParameterValueVm</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / BurVoucher / BurVoucher",
+    "method": "DELETE",
+    "url": "/api/BurVoucher",
+    "description": "<p>با ارسال شناسه سند، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Status / Ping",
+    "method": "GET",
+    "url": "/api/Ping",
+    "description": "<p>پاسخ پونگ به معنی در دسترس بودن سرور است</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Status / About",
+    "method": "GET",
+    "url": "/api/About",
+    "description": "<p>جزئیات نسخه نرم افزار و دیتابیس را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Unit / New",
+    "method": "GET",
+    "url": "/api/Unit/New",
+    "description": "<p>اطلاعات پیشنهادی و مورد نیاز برای ثبت واحد توسط متد پست، در خروجی این متد برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Unit / Unit",
+    "method": "GET",
+    "url": "/api/Unit",
+    "description": "<p>آرایه ای از همه واحدها برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Unit / Unit - id",
+    "method": "GET",
+    "url": "/api/Unit",
+    "description": "<p>با ارسال شناسه واحد، اطلاعات آن را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Unit / Unit - code",
+    "method": "GET",
+    "url": "/api/Unit",
+    "description": "<p>با ارسال کد واحد، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Unit / Unit",
+    "method": "POST",
+    "url": "/api/Unit",
+    "description": "<p>با استفاده از اطلاعات پیشنهادی دریافت شده از متد زیر، میتوانید با ارسال این ریکوئست یک واحد ثبت کنید</p>\n<p><code>New</code></p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Id",
+          "value": "",
+          "description": "<p>long</p>\n",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "Code",
+          "value": "",
+          "description": "<p>string - Required Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Title",
+          "value": "",
+          "description": "<p>string - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsEnable",
+          "value": "",
+          "description": "<p>boolean - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Unit / Unit",
+    "method": "PUT",
+    "url": "/api/Unit",
+    "description": "<p>اطلاعات واحد را ویرایش میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Id",
+          "value": "",
+          "description": "<p>long-Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Code",
+          "value": "",
+          "description": "<p>string - Required Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Title",
+          "value": "",
+          "description": "<p>string - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsEnable",
+          "value": "",
+          "description": "<p>boolean - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Unit / Unit - id",
+    "method": "DELETE",
+    "url": "/api/Unit",
+    "description": "<p>با ارسال شناسه واحد، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Unit / Unit - code",
+    "method": "DELETE",
+    "url": "/api/Unit",
+    "description": "<p>با ارسال کد واحد، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / ChequeBook / New",
+    "method": "GET",
+    "url": "/api/ChequeBook/New",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / ChequeBook / ChequeBook - bankCode",
+    "method": "GET",
+    "url": "/api/ChequeBook",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / ChequeBook / ChequeBook",
+    "method": "GET",
+    "url": "/api/ChequeBook",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / ChequeBook / ChequeBook - id",
+    "method": "GET",
+    "url": "/api/ChequeBook",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / ChequeBook / ChequeBook - code",
+    "method": "GET",
+    "url": "/api/ChequeBook",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / ChequeBook / ChequeBook",
+    "method": "POST",
+    "url": "/api/ChequeBook",
+    "description": "",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Code",
+          "value": "88",
+          "type": "text",
+          "description": "<p>string-Required  Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "BankCode",
+          "value": "1100010001",
+          "type": "text",
+          "description": "<p>string-Required  Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "Series",
+          "value": "123",
+          "type": "text",
+          "description": "<p>string-Required  </p>\n"
+        },
+        {
+          "key": "PageCount",
+          "value": "100",
+          "type": "text",
+          "description": "<p>long-Required  Matching regular expression pattern: ^[1-9]\\d{0,17}$</p>\n"
+        },
+        {
+          "key": "StartSerial",
+          "value": "1",
+          "type": "text",
+          "description": "<p>long-Required  Matching regular expression pattern: ^\\d{0,18}$</p>\n"
+        },
+        {
+          "key": "ReceiveDate",
+          "value": "",
+          "type": "text",
+          "description": "<p>datetime</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "IsEnable",
+          "value": "true",
+          "type": "text",
+          "description": "<p>boolean-Required</p>\n"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / ChequeBook / ChequeBook",
+    "method": "PUT",
+    "url": "/api/ChequeBook",
+    "description": "",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Id",
+          "value": "19",
+          "type": "text",
+          "description": "<p>long-Required </p>\n"
+        },
+        {
+          "key": "Code",
+          "value": "88",
+          "type": "text",
+          "description": "<p>string-Required  Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "BankCode",
+          "value": "1100010001",
+          "type": "text",
+          "description": "<p>string-Required  Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "Series",
+          "value": "123",
+          "type": "text",
+          "description": "<p>long-Required</p>\n"
+        },
+        {
+          "key": "PageCount",
+          "value": "100",
+          "type": "text",
+          "description": "<p>long-Required Matching regular expression pattern: ^[1-9]\\d{0,17}$</p>\n"
+        },
+        {
+          "key": "StartSerial",
+          "value": "1",
+          "type": "text",
+          "description": "<p>long-Required  Matching regular expression pattern: ^\\d{0,18}$</p>\n"
+        },
+        {
+          "key": "ReceiveDate",
+          "value": "2022-08-29 14:24:01",
+          "type": "text",
+          "description": "<p>datetime</p>\n"
+        },
+        {
+          "key": "IsEnable",
+          "value": "true",
+          "type": "text",
+          "description": "<p>boolean-Required</p>\n"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / ChequeBook / ChequeBook",
+    "method": "DELETE",
+    "url": "/api/ChequeBook",
+    "description": "",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Id",
+          "value": "19",
+          "type": "text",
+          "description": "<p>long-Required </p>\n"
+        },
+        {
+          "key": "Code",
+          "value": "88",
+          "type": "text",
+          "description": "<p>string-Required  Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "BankCode",
+          "value": "1100010001",
+          "type": "text",
+          "description": "<p>string-Required  Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "Series",
+          "value": "123",
+          "type": "text",
+          "description": "<p>long-Required</p>\n"
+        },
+        {
+          "key": "PageCount",
+          "value": "100",
+          "type": "text",
+          "description": "<p>long-Required Matching regular expression pattern: ^[1-9]\\d{0,17}$</p>\n"
+        },
+        {
+          "key": "StartSerial",
+          "value": "1",
+          "type": "text",
+          "description": "<p>long-Required  Matching regular expression pattern: ^\\d{0,18}$</p>\n"
+        },
+        {
+          "key": "ReceiveDate",
+          "value": "2022-08-29 14:24:01",
+          "type": "text",
+          "description": "<p>datetime</p>\n"
+        },
+        {
+          "key": "IsEnable",
+          "value": "true",
+          "type": "text",
+          "description": "<p>boolean-Required</p>\n"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / ChequeBook / Bank",
+    "method": "GET",
+    "url": "/api/ChequeBook/Bank",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Cheque / Payable / Get",
+    "method": "GET",
+    "url": "/api/Cheque/Payable",
+    "description": "<p>لیست چک های پرداختنی را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Cheque / Payable / Get - id",
+    "method": "GET",
+    "url": "/api/Cheque/Payable",
+    "description": "<p>با توجه به شناسه ارسال شده یک چک پرداختنی را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Cheque / Payable / New",
+    "method": "GET",
+    "url": "/api/Cheque/Payable/New",
+    "description": "<p>با ارسال کد دسته چک، اطلاعات پیشنهادی و مورد نیاز برای ثبت یک چک پرداختنی توسط متد پست، در خروجی این متد برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Cheque / Payable / Post",
+    "method": "POST",
+    "url": "/api/Cheque/Payable",
+    "description": "<p>با ارسال اطلاعات خواسته شده چک پرداختنی را ثبت میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "ChequeBookCode",
+          "value": "11",
+          "description": "<p>string - Required - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Series",
+          "value": "4307",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Serial",
+          "value": "821127",
+          "description": "<p>long - Required - Matching regular expression pattern: ^\\d{0,18}$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Date",
+          "value": "2023-02-19T00:00:00",
+          "description": "<p>date</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "InName",
+          "value": "حسن میرفندرسکی",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsDraft",
+          "value": "true",
+          "description": "<p>boolean</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "BankName",
+          "value": "تجارت - جواد",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Branch",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "AccountNo",
+          "value": "1521065717-0176",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "No",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Price",
+          "value": "1000000",
+          "description": "<p>decimal number - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsEnable",
+          "value": "true",
+          "description": "<p>boolean</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "ثبت در پستمن",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "SeyyadNumber",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "NationalCode",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsAmendment",
+          "value": "false",
+          "description": "<p>bool</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Cheque / Payable / Put",
+    "method": "PUT",
+    "url": "/api/Cheque/Payable",
+    "description": "<p>با ارسال اطلاعات خواسته شده چک پرداختنی را ویرایش میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Id",
+          "value": "5083",
+          "description": "<p>long - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ChequeBookCode",
+          "value": "20",
+          "description": "<p>string - Required - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Series",
+          "value": "4307",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Serial",
+          "value": "957010",
+          "description": "<p>long - Required - Matching regular expression pattern: ^\\d{0,18}$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Date",
+          "value": "",
+          "description": "<p>date</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "InName",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsDraft",
+          "value": "false",
+          "description": "<p>boolean</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "BankName",
+          "value": "تجارت - امیرحسین ",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Branch",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "AccountNo",
+          "value": "1521065709-1827",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "No",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Price",
+          "value": "500",
+          "description": "<p>decimal number - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsEnable",
+          "value": "true",
+          "description": "<p>boolean</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "SeyyadNumber",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "NationalCode",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsAmendment",
+          "value": "",
+          "description": "<p>bool</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Cheque / Receivable / Get",
+    "method": "GET",
+    "url": "/api/Cheque/Receivable",
+    "description": "<p>لیست چک های دریافتنی را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Cheque / Receivable / Get - id",
+    "method": "GET",
+    "url": "/api/Cheque/Receivable",
+    "description": "<p>با توجه به شناسه ارسال شده یک چک دریافتنی را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Cheque / Receivable / New",
+    "method": "GET",
+    "url": "/api/Cheque/Receivable/New",
+    "description": "<p>با ارسال کد دسته چک، اطلاعات پیشنهادی و مورد نیاز برای ثبت یک چک دریافتنی توسط متد پست، در خروجی این متد برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Cheque / Receivable / Post",
+    "method": "POST",
+    "url": "/api/Cheque/Receivable",
+    "description": "<p>با ارسال اطلاعات خواسته شده چک دریافتنی را ثبت میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Series",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Serial",
+          "value": "",
+          "description": "<p>long - Required - Matching regular expression pattern: ^\\d{0,18}$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Date",
+          "value": "",
+          "description": "<p>date</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "InName",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsDraft",
+          "value": "",
+          "description": "<p>boolean</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "BankName",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Branch",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "No",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Price",
+          "value": "",
+          "description": "<p>decimal number - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsEnable",
+          "value": "",
+          "description": "<p>boolean</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "SeyyadNumber",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "NationalCode",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Cheque / Receivable / Put",
+    "method": "PUT",
+    "url": "/api/Cheque/Receivable",
+    "description": "<p>با ارسال اطلاعات خواسته شده چک دریافتنی را ویرایش میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Id",
+          "value": "",
+          "description": "<p>long - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Series",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Serial",
+          "value": "",
+          "description": "<p>long - Required - Matching regular expression pattern: ^\\d{0,18}$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Date",
+          "value": "",
+          "description": "<p>date</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "InName",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsDraft",
+          "value": "",
+          "description": "<p>boolean</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "BankName",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Branch",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "PersonName",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "AccountNo",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "No",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Price",
+          "value": "",
+          "description": "<p>decimal number - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "IsEnable",
+          "value": "",
+          "description": "<p>boolean</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "SeyyadNumber",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "NationalCode",
+          "value": "",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Cheque / Cheque",
+    "method": "DELETE",
+    "url": "/api/Cheque",
+    "description": "<p>با ارسال شناسه چک، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Cheque / GetChequeInfo",
+    "method": "GET",
+    "url": "/api/Cheque/ChequeInfo",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Cheque / Record",
+    "method": "GET",
+    "url": "/api/Cheque/Record",
+    "description": "",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Cheque / Get",
+    "method": "GET",
+    "url": "/api/Cheque",
+    "description": "<p>لیست چک های پرداختنی را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / New - parentId",
+    "method": "GET",
+    "url": "/api/People/New",
+    "description": "<p>با ارسال شناسه والد، اطلاعات پیشنهادی و مورد نیاز برای ثبت شخص در زیرمجموعه آن والد توسط متد پست، در خروجی این متد برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / New - parentCode",
+    "method": "GET",
+    "url": "/api/People/New",
+    "description": "<p>StartFragment</p>\n<p>با ارسال کد والد، اطلاعات پیشنهادی و مورد نیاز برای ثبت شخص در زیرمجموعه آن والد توسط متد پست، در خروجی این متد برمیگردد</p>\n<p>EndFragment</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / People - parentId",
+    "method": "GET",
+    "url": "/api/People",
+    "description": "<p>با ارسال شناسه والد یک شخص یا گروه اشخاص، اشخاص و گروه های زیرمجموعه آن برمیگردد. برای دریافت اشخاص و گروه های ریشه، مقدار شناسه والد را نال ارسال کنید</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / People - parentCode",
+    "method": "GET",
+    "url": "/api/People",
+    "description": "<p>با ارسال کد والد یک شخص یا گروه اشخاص، اشخاص و گروه های زیرمجموعه آن برمیگردد. برای دریافت اشخاص و گروه های ریشه، مقدار شناسه والد را نال ارسال کنید</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / People - id",
+    "method": "GET",
+    "url": "/api/People",
+    "description": "<p>با ارسال شناسه یک شخص یا گروه اشخاص، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / People - code",
+    "method": "GET",
+    "url": "/api/People",
+    "description": "<p>با ارسال کد یک شخص یا گروه اشخاص، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / People - tag",
+    "method": "GET",
+    "url": "/api/People",
+    "description": "<p>با ارسال آرایه ای از برچسب ها، اشخاص دارای آن برچسب ها برمیگردند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / Tag",
+    "method": "GET",
+    "url": "/api/People/Tag",
+    "description": "<p>برچسب های اشخاص را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / AssignTags",
+    "method": "POST",
+    "url": "/api/People/AssignTags",
+    "description": "<p>با ارسال آرایه ای از بچسب ها، آن ها را به یک شخص تخصیص میدهد</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "TagCodes[0]",
+          "value": "21",
+          "type": "text"
+        },
+        {
+          "key": "TagCodes[1]",
+          "value": "22",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / People / People",
+    "method": "POST",
+    "url": "/api/People",
+    "description": "<p>با استفاده از اطلاعات پیشنهادی دریافت شده از متد زیر، میتوانید با ارسال این ریکوئست یک شخص یا گروه اشخاص ثبت کنید</p>\n<p><code>New</code></p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "ParentCode",
+          "value": "1000",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "SubCode",
+          "value": "10011",
+          "type": "text",
+          "description": "<p>string - Required - Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "FirstName",
+          "value": "غضنفر",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "LastName",
+          "value": "چمچاره",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "FatherName",
+          "value": "پنجعلی",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "Nationality",
+          "value": "2",
+          "type": "text",
+          "description": "<p>Iranian(1), Foreigner(2)</p>\n"
+        },
+        {
+          "key": "NationalCode",
+          "value": "188146222622",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^[0-9]*$</p>\n"
+        },
+        {
+          "key": "EconomicCode",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "BirthDate",
+          "value": "",
+          "type": "text",
+          "description": "<p>date</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Sexuality",
+          "value": "2",
+          "type": "text",
+          "description": "<p>Male(0), Female(1), Legal(2), Group(3) - Required</p>\n"
+        },
+        {
+          "key": "Address",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^+?(\\d[\\d-. ]+)?(([\\d-. ]+))?[\\d-. ]+\\d$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Phone",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^+?(\\d[\\d-. ]+)?(([\\d-. ]+))?[\\d-. ]+\\d$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "CellularPhone",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: \\A(?:[a-z0-9!#$%&amp;'+/=?^_<code>{|}~-]+(?:.[a-z0-9!#$%&amp;'+/=?^_</code>{|}~-]+)@(?:<a href=\"?:%5Ba-z0-9-%5D%5Ba-z0-9%5D\">a-z0-9</a>?.)+a-z0-9?)\\Z</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "EMail",
+          "value": "ghasanfar@gmail.com",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Web",
+          "value": "",
+          "type": "text",
+          "description": "<p>boolean</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "IsEnable",
+          "value": "true",
+          "type": "text",
+          "description": "<p>boolean</p>\n"
+        },
+        {
+          "key": "IsGroup",
+          "value": "false",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "IdNumber",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ZipCode",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Address2",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^+?(\\d[\\d-. ]+)?(([\\d-. ]+))?[\\d-. ]+\\d$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Fax",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "CityCode",
+          "value": "4900026",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "ProvinceCode",
+          "value": "",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "AccountNo",
+          "value": "",
+          "description": "<p>string - Matching regular expression pattern: ^(((\\d+-)+\\d+)|(\\d+))$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "CardNo",
+          "value": "",
+          "description": "<p>string- Matching regular expression pattern: ^(((\\d{4}-){3}\\d{4})|(\\d{16}))$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ShabaNo",
+          "value": "",
+          "description": "<p>string- Matching regular expression pattern: ^IR\\d{24}$\"</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / People / People",
+    "method": "PUT",
+    "url": "/api/People",
+    "description": "<p>اطلاعات شخص یا گروه اشخاص را ویرایش میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Id",
+          "value": "8731",
+          "type": "text",
+          "description": "<p>long-Required</p>\n"
+        },
+        {
+          "key": "FirstName",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "LastName",
+          "value": "دادخدایی مریم(مشهد)",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "FatherName",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Nationality",
+          "value": "1",
+          "type": "text",
+          "description": "<p>Iranian(1), Foreigner(2)</p>\n"
+        },
+        {
+          "key": "NationalCode",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "EconomicCode",
+          "value": "",
+          "type": "text",
+          "description": "<p>date</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "BirthDate",
+          "value": "",
+          "type": "text",
+          "description": "<p>Male(0), Female(1), Legal(2), Group(3) - Required</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Sexuality",
+          "value": "0",
+          "type": "text",
+          "description": "<p>string</p>\n"
+        },
+        {
+          "key": "Address",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^+?(\\d[\\d-. ]+)?(([\\d-. ]+))?[\\d-. ]+\\d$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Phone",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^+?(\\d[\\d-. ]+)?(([\\d-. ]+))?[\\d-. ]+\\d$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "CellularPhone",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: \\A(?:[a-z0-9!#$%&amp;'+/=?^_<code>{|}~-]+(?:.[a-z0-9!#$%&amp;'+/=?^_</code>{|}~-]+)@(?:<a href=\"?:%5Ba-z0-9-%5D%5Ba-z0-9%5D\">a-z0-9</a>?.)+a-z0-9?)\\Z</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "EMail",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Web",
+          "value": "",
+          "type": "text",
+          "description": "<p>boolean</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "IsEnable",
+          "value": "",
+          "type": "text",
+          "description": "<p>boolean</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "IsGroup",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Description",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "IdNumber",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^[0-9]*$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ZipCode",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Address2",
+          "value": "",
+          "type": "text",
+          "description": "<p>string - Matching regular expression pattern: ^+?(\\d[\\d-. ]+)?(([\\d-. ]+))?[\\d-. ]+\\d$</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "Fax",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "CityCode",
+          "value": "",
+          "type": "text",
+          "description": "<p>string</p>\n",
+          "disabled": true
+        },
+        {
+          "key": "ProvinceCode",
+          "value": "",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "AccountNo",
+          "value": "",
+          "description": "<p>string - Matching regular expression pattern: ^(((\\d+-)+\\d+)|(\\d+))$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "CardNo",
+          "value": "",
+          "description": "<p>string- Matching regular expression pattern: ^(((\\d{4}-){3}\\d{4})|(\\d{16}))$</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ShabaNo",
+          "value": "",
+          "description": "<p>string- Matching regular expression pattern: ^IR\\d{24}$\"</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / People / People - id",
+    "method": "DELETE",
+    "url": "/api/People",
+    "description": "<p>با ارسال شناسه یک شخص یا گروه اشخاص، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / People - code",
+    "method": "DELETE",
+    "url": "/api/People",
+    "description": "<p>با ارسال کد یک شخص یا گروه اشخاص، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / People / PersonDebt",
+    "method": "GET",
+    "url": "/api/People/PersonDebt",
+    "description": "<p>بدهی شخص تا تاریخ تعیین شده را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / WareParameter / WareParameter - wareGroupCode",
+    "method": "GET",
+    "url": "/api/WareParameter",
+    "description": "<p>با ارسال کد گروه کالایی، پارامترهای تعریف شده روی آن گروه برمیگردد</p>\n<p><strong>نکته:</strong> پارامترهای کالا فقط روی گروه های کالایی قابل تعریف بوده و روی کالاها تعریف نمیشوند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / WareParameter / WareParameter - id",
+    "method": "GET",
+    "url": "/api/WareParameter",
+    "description": "<p>با ارسال شناسه یک پارامتر گروه کالایی، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Period / Period",
+    "method": "GET",
+    "url": "/api/Period",
+    "description": "<p>آرایه ای از دوره های مالی برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Me / Me",
+    "method": "GET",
+    "url": "/api/Me",
+    "description": "<p>اطلاعات کاربر لاگین شده و مالک توکن را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Factor / Factor - proceedingCode",
+    "method": "GET",
+    "url": "/api/Factor",
+    "description": "<p>عوامل خزانه مرتبط با عملیات ارسال شده را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Factor / Factor - id",
+    "method": "GET",
+    "url": "/api/Factor",
+    "description": "<p>اطلاعات یک عامل خزانه را با توجه به شناسه ارسالی برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / ValueProvider / ValueProvider",
+    "method": "GET",
+    "url": "/api/ValueProvider",
+    "description": "<p>با ارسال اطلاعات یک پارامتر گروه کالایی یا عملیات، آرایه ای از مقادیری که آن پارامتر میتواند داشته باشد برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / ValueProvider / ValueProvider - value",
+    "method": "GET",
+    "url": "/api/ValueProvider",
+    "description": "<p>با ارسال اطلاعات یک پارامتر گروه کالایی یا عملیات به همراه مقدار آن، اطلاعات آن مقدار برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / ValueProvider / ValueProvider - GetAll",
+    "method": "GET",
+    "url": "/api/ValueProvider/GetAll",
+    "description": "<p>با ارسال اطلاعات آرایه ای از پارامترهای گروه کالایی یا عملیات، آرایه هایی از مقادیری که آن پارامترها میتوانند داشته باشند برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / PriceList / PriceList",
+    "method": "GET",
+    "url": "/api/PriceList",
+    "description": "<p>آرایه ای از لیست قیمت ها برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / PriceList / Detail",
+    "method": "GET",
+    "url": "/api/PriceList/Detail",
+    "description": "<p>اطلاعات قیمت یک کالا در لیست قیمت مشخص شده را برمیگرداند</p>\n<p>نکته: یک کالا میتواند در چند لیست قیمت، قیمت گذاری شده باشد. برای مثال کالا میتواند در لیست قیمت خرده فروشی قیمت متفاوتی نسبت به لیست قیمت عمده فروشی داشته باشد.</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / PriceList / Detail - id",
+    "method": "GET",
+    "url": "/api/PriceList/Detail",
+    "description": "<p>با ارسال شناسه جزییات قیمت، اطلاعات آن برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / PriceList / Detail",
+    "method": "POST",
+    "url": "/api/PriceList/Detail",
+    "description": "<p>با ارسال جزییات قیمت کالا از طریق این متد میتوانید کالا را در لیست قیمت تعیین شده قیمت گذاری کنید</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "PriceListCode",
+          "value": "12",
+          "description": "<p>string - Requird</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "WareCode",
+          "value": "1110151003",
+          "description": "<p>string - Requird</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Price",
+          "value": "3000",
+          "description": "<p>decimal number - Requird</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "MinPrice",
+          "value": "2300",
+          "description": "<p>decimal number</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Percent",
+          "value": "30",
+          "description": "<p>decimal number</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "تست",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "unitId",
+          "value": "",
+          "description": "<p>long</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / PriceList / Detail",
+    "method": "PUT",
+    "url": "/api/PriceList/Detail",
+    "description": "<p>جزییات قیمت یک کالا را ویرایش میکند</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "PriceListCode",
+          "value": "12",
+          "description": "<p>string - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "WareCode",
+          "value": "1110151003",
+          "description": "<p>string - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Price",
+          "value": "6000",
+          "description": "<p>decimal number - Required</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "MinPrice",
+          "value": "1300",
+          "description": "<p>decimal number</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Percent",
+          "value": "15",
+          "description": "<p>decimal number</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "Description",
+          "value": "ویرایش شده",
+          "description": "<p>string</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "unitId",
+          "value": "",
+          "description": "<p>long</p>\n",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / PriceList / Detail",
+    "method": "DELETE",
+    "url": "/api/PriceList/Detail",
+    "description": "<p>با ارسال کد کالا و کد لیست قیمت، قیمت آن کالا را در لیست قیمت تعیین شده حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / PriceList / Detail - id",
+    "method": "DELETE",
+    "url": "/api/PriceList/Detail",
+    "description": "<p>با ارسال شناسه جزییات قیمت، آن را حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / PriceList / Price",
+    "method": "POST",
+    "url": "/api/PriceList/Price",
+    "description": "<p>قیمت کالای در حال ثبت در یک عملیات را با توجه به فرمول تعریف شده بر روی لیست قیمت تعیین شده برمیگرداند</p>\n<p>نکته: میتوان روی لیست قیمت فرمول نویسی کرد تا قیمت با توجه به پارامترهای خاصی محاسبه شود</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "PeriodCode",
+          "value": "1",
+          "description": "<p>long</p>\n",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "BaseRecordId",
+          "value": "15452",
+          "description": "<p>long</p>\n",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "Quantity",
+          "value": "1.0",
+          "description": "<p>decimal number</p>\n",
+          "type": "text"
+        },
+        {
+          "key": "ParameterValues[0].ParameterId",
+          "value": "379",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[0].Value",
+          "value": "4",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].ParameterId",
+          "value": "117",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].Value",
+          "value": "35",
+          "type": "text",
+          "disabled": true
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Stocktaking / List",
+    "method": "GET",
+    "url": "/api/Stocktaking/List",
+    "description": "<p>لیست های انبارگردانی را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Stocktaking / List - code",
+    "method": "GET",
+    "url": "/api/Stocktaking/List",
+    "description": "<p>با ارسال کد لیست انبارگردانی، آن را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Stocktaking / WareGroup",
+    "method": "GET",
+    "url": "/api/Stocktaking/WareGroup",
+    "description": "<p>آرایه ای از گروه های شمارش زیر مجموعه یک لیست انبارگردانی را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Stocktaking / Ware",
+    "method": "GET",
+    "url": "/api/Stocktaking/Ware",
+    "description": "<p>آرایه ای از کالاهای یک گروه شمارش از یک لیست انبارگردانی را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Stocktaking / BarcodePattern",
+    "method": "GET",
+    "url": "/api/Stocktaking/BarcodePattern",
+    "description": "<p>الگوی بارکد تعریف شده روی یک گروه شمارش را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Stocktaking / Stock",
+    "method": "POST",
+    "url": "/api/Stocktaking/Stock",
+    "description": "<p>موجودی یک کالا یا موجودی یک کالا با پارامترهای مشخص شده را ثبت میکند. موجودی میتواند با واحدهای شمارش گوناگون بصورت مجزا ثبت شود</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "ListCode",
+          "value": "17",
+          "type": "text",
+          "description": "<p>string- Required</p>\n"
+        },
+        {
+          "key": "WareCode",
+          "value": "110101011094",
+          "type": "text",
+          "description": "<p>string- Required</p>\n"
+        },
+        {
+          "key": "UnitId",
+          "value": "98",
+          "type": "text"
+        },
+        {
+          "key": "Quantity",
+          "value": "13.0",
+          "type": "text",
+          "description": "<p>decimal number- Required</p>\n"
+        },
+        {
+          "key": "Date",
+          "value": "2022-07-24 08:54:16",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[0].ParameterId",
+          "value": "1",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[0].Value",
+          "value": "قرمز",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].ParameterId",
+          "value": "2",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].Value",
+          "value": "لارج",
+          "type": "text",
+          "disabled": true
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Stocktaking / Stock",
+    "method": "PUT",
+    "url": "/api/Stocktaking/Stock",
+    "description": "<p>موجودی یک کالا یا موجودی یک کالا با پارامترهای مشخص شده را ثبت میکند. موجودی میتواند با واحدهای شمارش گوناگون بصورت مجزا ثبت شود</p>\n",
+    "headers": [],
+    "body": {
+      "mode": "urlencoded",
+      "urlencoded": [
+        {
+          "key": "Id",
+          "value": "1",
+          "type": "text",
+          "description": "<p>long- Required</p>\n"
+        },
+        {
+          "key": "UnitId",
+          "value": "98",
+          "type": "text",
+          "description": "<p>long</p>\n"
+        },
+        {
+          "key": "Quantity",
+          "value": "13.0",
+          "type": "text",
+          "description": "<p>decimal number- Required</p>\n"
+        },
+        {
+          "key": "Date",
+          "value": "2022-07-24 08:54:16",
+          "type": "text",
+          "description": "<p>date</p>\n"
+        },
+        {
+          "key": "ParameterValues[0].ParameterId",
+          "value": "1",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[0].Value",
+          "value": "قرمز",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].ParameterId",
+          "value": "2",
+          "type": "text",
+          "disabled": true
+        },
+        {
+          "key": "ParameterValues[1].Value",
+          "value": "لارج",
+          "type": "text",
+          "disabled": true
+        }
+      ]
+    }
+  },
+  {
+    "name": "Sayan / Stocktaking / WareValues",
+    "method": "GET",
+    "url": "/api/Stocktaking/WareValues",
+    "description": "<p>اگر گروه شمارش انبارگردانی دارای پارامتر باشد، با ارسال کد لیست انبارگردانی و کد کالا، کالا را با حالت های مختلف ضرب شده در پارامترها برمیگرداند. برای مثال آرایه ای از حالت های مختلف پیراهن قرمز لارج، پیراهن قرمز اسمال، پیراهن آبی لارج، پیراهن آبی اسمال و غیره</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Stocktaking / Stock",
+    "method": "DELETE",
+    "url": "/api/Stocktaking/Stock",
+    "description": "<p>در یک لیست شمارش، شمارش یک کالا را با پارامترها و واحد مشخص شده حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Stocktaking / Stock",
+    "method": "DELETE",
+    "url": "/api/Stocktaking/Stock",
+    "description": "<p>در یک لیست شمارش، شمارش یک کالا را با پارامترها و واحد مشخص شده حذف میکند</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Stocktaking / StockRecord",
+    "method": "GET",
+    "url": "/api/Stocktaking/StockRecord",
+    "description": "<p>اگر گروه شمارش فاقد پارامتر باشد از این متد برای دریافت کالاها استفاده میکنیم. در این صورت شمارش های انجام شده به تفکیک واحد شمارش برمیگردد. برای مثال اگر یک کالا هم با واحد \"عدد\" شمارش شده باشد و هم با واحد \"کارتن\"، در جواب دو آبجکت از این کالا و با واحدهای متفاوت دریافت خواهد شد. از هر کالای شمارش نشده همیشه فقط یک آبجکت برمیگردد</p>\n",
+    "headers": [],
+    "body": null
+  },
+  {
+    "name": "Sayan / Stocktaking / WareUnits",
+    "method": "GET",
+    "url": "/api/Stocktaking/WareUnits",
+    "description": "<p>واحدهای شمارش نشده کالا را برمیگرداند</p>\n",
+    "headers": [],
+    "body": null
+  }
+]
