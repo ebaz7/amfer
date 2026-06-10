@@ -39,13 +39,15 @@ export interface LogEntry {
   id: string;
   timestamp: string;
   url: string;
+  endpoint?: string;
   method: string;
   ip: string;
   status: number;
   responseTime: number;
+  message?: string;
   error?: string;
   apiKeyName?: string;
-  source: 'api-proxy' | 'sql-direct' | 'simulation';
+  source: string;
 }
 
 export interface SystemStatus {

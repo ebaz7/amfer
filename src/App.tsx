@@ -627,26 +627,86 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Middle Grid - Active Key Status & Pre-built queries */}
+                {/* Middle Grid - Active Key Status & Traffic */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   
-                  {/* Left Column: API Overview */}
-                  <div className="lg:col-span-1 bg-[#18181b] rounded-xl border border-[#27272a] p-4 flex flex-col justify-between">
-                    <div className="flex items-center justify-between border-b border-[#27272a] pb-2">
+                  {/* Left Column: API Overview & Traffic Monitor */}
+                  <div className="lg:col-span-2 bg-[#18181b] rounded-xl border border-[#27272a] overflow-hidden flex flex-col">
+                    <div className="flex items-center justify-between border-b border-[#27272a] p-4">
                       <h3 className="font-semibold text-[#e4e4e7] flex items-center gap-2 text-xs">
-                        <Shield className="w-4 h-4 text-blue-500" />
-                        امنیت و مجوزهای واسط
+                        <Activity className="w-4 h-4 text-emerald-500" />
+                        مانیتورینگ زنده ترافیک ورودی (Live Traffic Monitor)
                       </h3>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="text-[10px] text-[#71717a]">در حال شنود...</span>
+                      </div>
                     </div>
 
-                    <div className="space-y-4 mt-3">
-                      <div>
-                        <span className="text-[11px] text-[#a1a1aa]">تعداد کلیدهای فعال صادر شده:</span>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-lg font-mono font-bold text-white">{apiKeys.filter(k => k.status === 'active').length}</span>
-                          <span className="text-[11px] text-[#71717a]">عدد فعال</span>
+                    <div className="flex-1 overflow-y-auto max-h-[350px]">
+                      {logs.filter(l => (l.endpoint || l.url)?.startsWith('/api/external/v1')).length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-[#71717a]">
+                          <Activity className="w-8 h-8 opacity-20 mb-2" />
+                          <p>هنوز درخواستی از خارج پنل دریافت نشده است.</p>
+                          <p className="text-[10px] mt-1 italic">نکته: از زبانه مستندات برای تست اتصال استفاده کنید.</p>
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-[#27272a]">
+                          {logs.filter(l => (l.endpoint || l.url)?.startsWith('/api/external/v1')).slice(0, 15).map((log) => (
+                            <div key={log.id} className="p-3 hover:bg-[#1c1c1f] transition-colors flex items-center gap-4">
+                              <div className={`w-8 h-8 rounded shrink-0 flex items-center justify-center font-mono text-[10px] font-bold ${
+                                log.status < 400 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'
+                              }`}>
+                                {log.status}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-mono text-white text-[11px] font-bold uppercase">{log.method}</span>
+                                  <span className="text-[#a1a1aa] font-mono text-[10px] truncate" dir="ltr">{log.endpoint || log.url}</span>
+                                </div>
+                                <div className="text-[10px] text-[#71717a] mt-0.5 truncate">
+                                  {log.message || log.error || 'درخواست پردازش شد'}
+                                </div>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <div className="text-[10px] text-white font-mono">{new Date(log.timestamp).toLocaleTimeString('fa-IR')}</div>
+                                <div className="text-[9px] text-[#71717a] mt-0.5 font-mono" dir="ltr">{log.ip || log.source}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="p-3 bg-[#1c1c1f]/50 border-t border-[#27272a] flex justify-between items-center text-[10px]">
+                      <span className="text-[#71717a]">نمودار وضعیت درخواست‌های خارجی</span>
+                      <button 
+                        onClick={loadAllData}
+                        className="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        به‌روزرسانی لحظه‌ای
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Right Column: API Highlights */}
+                  <div className="lg:col-span-1 space-y-4">
+                    <div className="bg-[#18181b] rounded-xl border border-[#27272a] p-4">
+                      <h3 className="font-semibold text-[#e4e4e7] flex items-center gap-2 text-xs mb-3">
+                        <Shield className="w-4 h-4 text-blue-500" />
+                        وضعیت امنیت کلیدها
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <span className="text-[11px] text-[#a1a1aa]">تعداد کلیدهای فعال صادر شده:</span>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-lg font-mono font-bold text-white">{apiKeys.filter(k => k.status === 'active').length}</span>
+                            <span className="text-[11px] text-[#71717a]">عدد فعال</span>
+                          </div>
                         </div>
                       </div>
+                    </div>
 
                       <div className="p-3 bg-[#09090b] rounded-lg border border-[#27272a] text-[11px] text-[#a1a1aa] leading-relaxed space-y-2">
                         <div className="font-bold text-[#e4e4e7] flex items-center gap-1">
@@ -668,10 +728,9 @@ export default function App() {
                         مدیریت کلیدهای API و کدهای آماده
                       </button>
                     </div>
-                  </div>
 
-                  {/* Right Column: Prebuilt Reports List */}
-                  <div className="lg:col-span-2 bg-[#18181b] rounded-xl border border-[#27272a] p-4 space-y-3">
+                    {/* Full-width Row: Prebuilt Reports List */}
+                    <div className="lg:col-span-3 bg-[#18181b] rounded-xl border border-[#27272a] p-4 space-y-3">
                     <div className="flex items-center justify-between border-b border-[#27272a] pb-2">
                       <h3 className="font-semibold text-[#e4e4e7] flex items-center gap-2 text-xs">
                         <Terminal className="w-4 h-4 text-blue-500" />
@@ -2274,6 +2333,31 @@ export default function App() {
 
                     <div className="space-y-4">
                       
+                      {/* Connection Cheat Sheet */}
+                      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-5">
+                        <h3 className="text-sm font-bold text-blue-400 flex items-center gap-2 mb-3">
+                          <Smartphone className="w-4 h-4" />
+                          <span>خلاصه تنظیمات اتصال برای برنامه‌نویس</span>
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <span className="text-[10px] text-[#a1a1aa] block uppercase font-bold tracking-wider">Base URL (آدرس ریشه پورتال):</span>
+                            <div className="bg-[#09090b] p-2 rounded font-mono text-[11px] text-white overflow-x-auto whitespace-nowrap" dir="ltr">
+                              {window.location.origin}/api/external/v1
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <span className="text-[10px] text-[#a1a1aa] block uppercase font-bold tracking-wider">Example Full Endpoint:</span>
+                            <div className="bg-[#09090b] p-2 rounded font-mono text-[11px] text-emerald-400 overflow-x-auto whitespace-nowrap" dir="ltr">
+                              {window.location.origin}/api/external/v1/customers
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-4 p-3 bg-amber-500/5 border border-amber-500/20 rounded-md text-[11px] text-amber-200/80 leading-relaxed italic">
+                          نکته مهم: اگر از برنامه‌های موبایل یا سایت‌های خارجی متصل می‌شوید، حتماً از آدرس دامنه یا آی‌پی عمومی سرور (که همین صفحه روی آن باز است) استفاده کنید. آدرس localhost فقط برای تست داخل خود سرور است.
+                        </div>
+                      </div>
+
                       {/* Section 1: Authentication */}
                       <div className="bg-[#18181b] border border-[#27272a] rounded-lg p-4 space-y-3">
                         <h3 className="text-[13px] font-bold text-white flex items-center gap-2">

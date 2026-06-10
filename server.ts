@@ -1316,6 +1316,26 @@ app.all("/api/external/v1/*", async (req, res, next) => {
   }
 
   const foundKey = storage.keys.find((k: ApiKey) => k.key === providedKey);
+  
+  // LOG THE HIT
+  const hitLog: LogEntry = {
+    id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+    timestamp: new Date().toISOString(),
+    method: req.method,
+    url: req.url,
+    endpoint: req.url,
+    ip: req.ip || "unknown",
+    status: foundKey ? 200 : 403,
+    responseTime: 0,
+    message: foundKey 
+      ? `درخواست معتبر از: ${foundKey.name}` 
+      : `درخواست نامعتبر با کلید: ${providedKey.substring(0, 8)}...`,
+    source: "api-gateway"
+  };
+  storage.logs.unshift(hitLog);
+  if (storage.logs.length > 500) storage.logs.pop();
+  saveStorage(storage);
+
   if (!foundKey) {
     return res.status(403).json({
       success: false,
