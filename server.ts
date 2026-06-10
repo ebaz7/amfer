@@ -55,6 +55,14 @@ function loadStorage() {
       description: "لیست آخرین اقلام اسناد حسابداری ثبت شده در دفتر کل و معین سایان",
       category: "حسابداری",
       isCustom: false
+    },
+    {
+      id: "q-test-connection",
+      name: "تست عمومی سرور و صحت اتصال (فول‌پروف - بدون نیاز به جدول)",
+      queryText: "SELECT DB_NAME() AS [Active_Database], @@VERSION AS [SQL_Server_Version], GETDATE() AS [Server_Time]",
+      description: "صرفاً جهت راستی‌آزمایی فیزیکی پورت، آی‌پی و دسترسی کاربر بدون وابستگی به ساختار جداول سایان",
+      category: "حسابداری",
+      isCustom: false
     }
   ];
 
@@ -140,24 +148,47 @@ async function connectToDatabase() {
 
   const { host, port, database, user, pass, encrypt, trustServerCertificate } = storage.dbConfig;
   
-  if (!pass) {
-    // If password is not provided, do not try to run real database connection
+  if (pass === undefined) {
+    // If password is undefined, do not try to run real database connection
     isDbConnected = false;
     return false;
   }
 
+  // Handle Named Instances (e.g. computer\SAYANSQL2022N or 127.0.0.1\SAYANSQL2022N)
+  let serverHost = host || "127.0.0.1";
+  let instanceName: string | undefined = undefined;
+
+  if (serverHost.includes("\\")) {
+    const parts = serverHost.split("\\");
+    serverHost = parts[0];
+    instanceName = parts[1];
+  }
+
   const configStr: sql.config = {
-    server: host,
-    port: port || 1433,
+    server: serverHost,
     database: database,
     user: user,
     password: pass,
     options: {
       encrypt: encrypt,
       trustServerCertificate: trustServerCertificate,
-      connectTimeout: 5000
+      connectTimeout: 8000
     }
   };
+
+  // If there's a named instance, tedious prefers to resolve port dynamically via SQL Browser.
+  // Otherwise, we enforce the configured port (defaulting to 1433).
+  if (instanceName) {
+    configStr.options = {
+      ...configStr.options,
+      instanceName: instanceName
+    };
+    if (port && port !== 1433) {
+      configStr.port = port;
+    }
+  } else {
+    configStr.port = port || 1433;
+  }
 
   try {
     sqlPool = new sql.ConnectionPool(configStr);
@@ -370,6 +401,43 @@ app.delete("/api/gateway/queries/:id", (req, res) => {
   res.json({ success: true, message: "گزارش با موفقیت حذف شد" });
 });
 
+// Sayan Live Schema & Databases Auto-Discovery Endpoint
+app.get("/api/gateway/discover", async (req, res) => {
+  if (!isDbConnected || !sqlPool) {
+    return res.json({ 
+      success: false, 
+      error: "اتصال فیزیکی به پایگاه داده سایان برقرار نیست (شبیه‌ساز فعال است)" 
+    });
+  }
+  try {
+    // 1. Get databases available on this engine
+    const dbResult = await sqlPool.request().query("SELECT name FROM sys.databases WHERE database_id > 4 ORDER BY name;");
+    const databases = dbResult.recordset.map((r: any) => r.name);
+
+    // 2. Get tables in the CURRENT actively configured database
+    const tablesResult = await sqlPool.request().query(
+      "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' ORDER BY TABLE_NAME;"
+    );
+    const tables = tablesResult.recordset.map((r: any) => r.TABLE_NAME);
+
+    // 3. Active database name
+    const currentDbResult = await sqlPool.request().query("SELECT DB_NAME() AS current_db;");
+    const currentDb = currentDbResult.recordset[0]?.current_db || "";
+
+    res.json({
+      success: true,
+      currentDb,
+      databases,
+      tables
+    });
+  } catch (err: any) {
+    res.json({
+      success: false,
+      error: `خطا در بازخوانی ساختار دیتابیس: ${err.message}`
+    });
+  }
+});
+
 // Request Logs inside panel
 app.get("/api/gateway/logs", (req, res) => {
   // Return the last 150 request logs
@@ -383,17 +451,236 @@ app.post("/api/gateway/logs/clear", (req, res) => {
 });
 
 // Main Route to test execute queries inside the GUI Console
+async function autoCorrectSayanQuery(sqlQuery: string): Promise<{ query: string; changes: string[] }> {
+  if (!isDbConnected || !sqlPool) return { query: sqlQuery, changes: [] };
+
+  try {
+    // 1. Get physical tables from database
+    const tablesResult = await sqlPool.request().query(
+      "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';"
+    );
+    const dbTables = tablesResult.recordset.map((r: any) => r.TABLE_NAME) as string[];
+    
+    let correctedQuery = sqlQuery;
+    const changes: string[] = [];
+
+    // 2. Define our target templates and matchers
+    const mappingTemplates = [
+      { key: "tblcustomer", patterns: ["tblcustomer", "tbl_customer", "customer", "partners", "tblpartner", "moshtari", "shakhs", "ashkhas", "tblpersons", "tblperson"] },
+      { key: "tblfactor", patterns: ["tblfactor", "tbl_factor", "factor", "invoice", "tblinvoice", "sanadfactor", "factors", "tblfactorheader", "tblfactors"] },
+      { key: "tblgoods", patterns: ["tblgoods", "tbl_goods", "goods", "kala", "tblkala", "products", "product", "tbl_kala"] },
+      { key: "tblstock", patterns: ["tblstock", "tbl_stock", "stock", "anbar", "tblanbar", "mojodi", "mojoodi"] },
+      { key: "tblsanaddetail", patterns: ["tblsanaddetail", "tbl_sanaddetail", "sanaddetail", "sanad_detail", "asnad"] },
+      { key: "tblsanadheader", patterns: ["tblsanadheader", "tbl_sanadheader", "sanadheader", "sanad_header"] }
+    ];
+
+    // For each template, find the best actual match in dbTables
+    for (const template of mappingTemplates) {
+      // Find matches in dbTables
+      let bestMatch: string | null = null;
+      
+      // Try exact case-insensitive match on patterns
+      for (const pattern of template.patterns) {
+        const found = dbTables.find(t => t.toLowerCase() === pattern);
+        if (found) {
+          bestMatch = found;
+          break;
+        }
+      }
+
+      // If no exact match, try partial/includes matches
+      if (!bestMatch) {
+         for (const pattern of template.patterns) {
+           const found = dbTables.find(t => t.toLowerCase().includes(pattern));
+           if (found) {
+             bestMatch = found;
+             break;
+           }
+         }
+      }
+
+      // If we found a physical table matching this Sayan concept
+      if (bestMatch) {
+        // Find if user query references any of our template patterns
+        for (const pattern of template.patterns) {
+          // Use regex with word boundaries to replace exact patterns
+          const regex = new RegExp(`\\b${pattern}\\b`, "gi");
+          if (regex.test(correctedQuery)) {
+            // Check if it already matches the exact case, otherwise we replace it!
+            const countBefore = (correctedQuery.match(new RegExp(`\\b${bestMatch}\\b`, "g")) || []).length;
+            correctedQuery = correctedQuery.replace(regex, bestMatch);
+            const countAfter = (correctedQuery.match(new RegExp(`\\b${bestMatch}\\b`, "g")) || []).length;
+            
+            if (countAfter > countBefore) {
+              changes.push(`اصلاح الگوی جدول '${pattern}' به نام فیزیکی واقعی دیتابیس شما: '${bestMatch}'`);
+            }
+          }
+        }
+      }
+    }
+
+    // 3. Collation Case Correction for existing physical tables
+    // In case the query already contains a table name but has wrong casing (e.g. user typed lowercase)
+    for (const realTblName of dbTables) {
+      const regex = new RegExp(`\\b${realTblName.toLowerCase()}\\b`, "gi");
+      if (regex.test(correctedQuery) && !correctedQuery.includes(realTblName)) {
+        correctedQuery = correctedQuery.replace(regex, realTblName);
+        changes.push(`تصحیح بزرگی/کوچکی نام جدول بر اساس کلاسیفیکیشن فیزیکی: '${realTblName}'`);
+      }
+    }
+
+    // 4. Columns Casing Auto-Correction (Collation matching)
+    // Find all referenced tables in the query
+    const referencedTables = dbTables.filter(tbl => {
+      const regex = new RegExp(`\\b${tbl}\\b`, "i");
+      return regex.test(correctedQuery);
+    });
+
+    if (referencedTables.length > 0) {
+      try {
+        const tableListStr = referencedTables.map(tbl => `'${tbl}'`).join(",");
+        const columnsResult = await sqlPool.request().query(
+          `SELECT TABLE_NAME, COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME IN (${tableListStr});`
+        );
+        const dbColumns = columnsResult.recordset as Array<{ TABLE_NAME: string, COLUMN_NAME: string }>;
+
+        // ---- 4.1 SYNONYM COLUMN REPLACEMENTS FOR SAYAN ERP ----
+        // Sayan has variations across versions: e.g. CustomerID vs PartnerID
+        for (const tbl of referencedTables) {
+          const tblColNames = dbColumns
+            .filter(c => c.TABLE_NAME.toLowerCase() === tbl.toLowerCase())
+            .map(c => c.COLUMN_NAME);
+
+          const lowerTblCols = tblColNames.map(n => n.toLowerCase());
+
+          // 1. Customer Synonym Mapping (tblCustomer / tblPartner / tblPersons)
+          // If the physical table has "partnerid" but query has "customerid"
+          if (lowerTblCols.includes("partnerid") && !lowerTblCols.includes("customerid")) {
+            const realColName = tblColNames.find(n => n.toLowerCase() === "partnerid") || "PartnerID";
+            const regex = /\bcustomerid\b/gi;
+            if (regex.test(correctedQuery)) {
+              correctedQuery = correctedQuery.replace(regex, realColName);
+              changes.push(`تبدیل فیلد شناسه مشتری 'CustomerID' به نام ستون واقعی سایان: '${realColName}'`);
+            }
+          }
+          if (lowerTblCols.includes("partnercode") && !lowerTblCols.includes("customercode")) {
+            const realColName = tblColNames.find(n => n.toLowerCase() === "partnercode") || "PartnerCode";
+            const regex = /\bcustomercode\b/gi;
+            if (regex.test(correctedQuery)) {
+              correctedQuery = correctedQuery.replace(regex, realColName);
+              changes.push(`تبدیل فیلد کد مشتری 'CustomerCode' به نام ستون واقعی سایان: '${realColName}'`);
+            }
+          }
+          if (lowerTblCols.includes("partnername") && !lowerTblCols.includes("customername")) {
+            const realColName = tblColNames.find(n => n.toLowerCase() === "partnername") || "PartnerName";
+            const regex = /\bcustomername\b/gi;
+            if (regex.test(correctedQuery)) {
+              correctedQuery = correctedQuery.replace(regex, realColName);
+              changes.push(`تبدیل فیلد نام مشتری 'CustomerName' به نام ستون واقعی سایان: '${realColName}'`);
+            }
+          }
+
+          // 2. Goods Synonym Mapping (tblGoods holds "GoodID", "GoodCode", "GoodName" sometimes)
+          if (lowerTblCols.includes("goodid") && !lowerTblCols.includes("goodsid")) {
+            const realColName = tblColNames.find(n => n.toLowerCase() === "goodid") || "GoodID";
+            const regex = /\bgoodsid\b/gi;
+            if (regex.test(correctedQuery)) {
+              correctedQuery = correctedQuery.replace(regex, realColName);
+              changes.push(`اصلاح فیلد کالا 'GoodsID' به شناسه کالا در جدول شما: '${realColName}'`);
+            }
+          }
+          if (lowerTblCols.includes("goodcode") && !lowerTblCols.includes("goodscode")) {
+            const realColName = tblColNames.find(n => n.toLowerCase() === "goodcode") || "GoodCode";
+            const regex = /\bgoodscode\b/gi;
+            if (regex.test(correctedQuery)) {
+              correctedQuery = correctedQuery.replace(regex, realColName);
+              changes.push(`اصلاح کد کالا 'GoodsCode' به کد کالا در جدول شما: '${realColName}'`);
+            }
+          }
+          if (lowerTblCols.includes("goodname") && !lowerTblCols.includes("goodsname")) {
+            const realColName = tblColNames.find(n => n.toLowerCase() === "goodname") || "GoodName";
+            const regex = /\bgoodsname\b/gi;
+            if (regex.test(correctedQuery)) {
+              correctedQuery = correctedQuery.replace(regex, realColName);
+              changes.push(`اصلاح نام کالا 'GoodsName' به نام کالا در جدول شما: '${realColName}'`);
+            }
+          }
+
+          // 3. Stock Synonym Mapping (tblStock / tblStockCount / tblWarehouseStock)
+          if (lowerTblCols.includes("mojodi") && !lowerTblCols.includes("stockcount")) {
+            const realColName = tblColNames.find(n => n.toLowerCase() === "mojodi") || "Mojodi";
+            const regex = /\bstockcount\b/gi;
+            if (regex.test(correctedQuery)) {
+              correctedQuery = correctedQuery.replace(regex, realColName);
+              changes.push(`ترجمه فیلد موجودی کالا 'StockCount' به ستون محلی دیتابیس سایان: '${realColName}'`);
+            }
+          }
+          if (lowerTblCols.includes("mojoodi") && !lowerTblCols.includes("stockcount")) {
+            const realColName = tblColNames.find(n => n.toLowerCase() === "mojoodi") || "Mojoodi";
+            const regex = /\bstockcount\b/gi;
+            if (regex.test(correctedQuery)) {
+              correctedQuery = correctedQuery.replace(regex, realColName);
+              changes.push(`ترجمه فیلد موجودی کالا 'StockCount' به ستون محلی دیتابیس سایان: '${realColName}'`);
+            }
+          }
+        }
+
+        // ---- 4.2 COLUMN CASING CORRECTOR ----
+        for (const colObj of dbColumns) {
+          const realColName = colObj.COLUMN_NAME;
+          const lowerCol = realColName.toLowerCase();
+
+          // Skip general short keywords to keep query valid
+          const commonSqlKeywords = ["id", "select", "from", "where", "and", "or", "on", "left", "join", "order", "by", "desc", "asc", "top", "sum", "count", "type", "date", "name"];
+          if (commonSqlKeywords.includes(lowerCol)) continue;
+
+          const regex = new RegExp(`\\b${lowerCol}\\b`, "gi");
+          
+          if (regex.test(correctedQuery) && !correctedQuery.includes(realColName)) {
+            correctedQuery = correctedQuery.replace(regex, realColName);
+            changes.push(`تصحیح بزرگی/کوچکی نام ستون دیتابیس: '${realColName}'`);
+          }
+        }
+      } catch (colErr) {
+        console.warn("Column casing auto-correction failed:", colErr);
+      }
+    }
+
+    // Deduplicate changes
+    const uniqueChanges = Array.from(new Set(changes));
+
+    return {
+      query: correctedQuery,
+      changes: uniqueChanges
+    };
+
+  } catch (err: any) {
+    console.error("Auto correction helper failed:", err.message);
+    return { query: sqlQuery, changes: [] };
+  }
+}
+
 app.post("/api/gateway/query/test", async (req, res) => {
-  const { queryText } = req.body;
+  const { queryText, forceRealConnection } = req.body;
   if (!queryText) {
     return res.status(400).json({ error: "متن کوئری تعریف نشده است" });
   }
 
   const start = Date.now();
   
+  // Dynamic reconnect attempt if not active or if direct test is requested
+  if (!isDbConnected || forceRealConnection) {
+    console.log("Direct real Sayan SQL execution requested. Trying to establish connection on-the-fly...");
+    await connectToDatabase();
+  }
+  
   if (isDbConnected && sqlPool) {
     try {
-      const result = await sqlPool.request().query(queryText);
+      // Auto correct and match tables dynamically
+      const correction = await autoCorrectSayanQuery(queryText);
+      const finalQuery = correction.query;
+
+      const result = await sqlPool.request().query(finalQuery);
       const responseTime = Date.now() - start;
 
       // Log execution
@@ -416,7 +703,9 @@ app.post("/api/gateway/query/test", async (req, res) => {
         source: "sql-direct",
         responseTime,
         recordCount: result.recordset.length,
-        rows: result.recordset
+        rows: result.recordset,
+        correctedQuery: finalQuery !== queryText ? finalQuery : undefined,
+        corrections: correction.changes.length > 0 ? correction.changes : undefined
       });
     } catch (err: any) {
       const responseTime = Date.now() - start;
@@ -439,11 +728,23 @@ app.post("/api/gateway/query/test", async (req, res) => {
         success: false,
         error: err.message,
         responseTime,
-        hint: "املاء کوئری را بررسی کرده و مطمئن شوید جداول انتخابی در دیتابیس سایان وجود دارند."
+        hint: `خطای پایگاه داده: ${err.message}. املاء کوئری را بررسی کرده و مطمئن شوید جداول انتخابی وجود دارند.`
       });
     }
   } else {
-    // Simul Mode
+    // If the user requested a strict real connection test, DO NOT fallback to simulated data under any circumstances!
+    if (forceRealConnection) {
+      const responseTime = Date.now() - start;
+      return res.status(500).json({
+        success: false,
+        source: "sql-direct",
+        error: "ارتباط زنده با پایگاه داده مایکروسافت SQL سرور برقرار نیست و حالت شبیه‌ساز غیرفعال است.",
+        responseTime,
+        hint: "اتصال به شبکه، دیوار آتش (Firewall) پورت ۱۴۳۳، صحت رمز ورود و دسترسی‌های دیتابیس سایان را بررسی کنید."
+      });
+    }
+
+    // Simul Mode Fallback if not forced
     const mockRows = executeSimulatedQuery(queryText);
     const responseTime = Math.round(10 + Math.random() * 45); // simulate DB network lag
 
@@ -554,7 +855,9 @@ app.post("/api/external/v1/query", async (req, res) => {
   const start = Date.now();
   if (isDbConnected && sqlPool) {
     try {
-      const result = await sqlPool.request().query(query);
+      const correction = await autoCorrectSayanQuery(query);
+      const finalQuery = correction.query;
+      const result = await sqlPool.request().query(finalQuery);
       const responseTime = Date.now() - start;
 
       const newLog: LogEntry = {
@@ -576,6 +879,7 @@ app.post("/api/external/v1/query", async (req, res) => {
         source: "sql-direct",
         responseTime,
         recordCount: result.recordset.length,
+        correctedQuery: finalQuery !== query ? finalQuery : undefined,
         data: result.recordset
       });
     } catch (err: any) {
@@ -640,7 +944,8 @@ app.get("/api/external/v1/customers", async (req, res) => {
   if (isDbConnected && sqlPool) {
     try {
       const query = "SELECT CustomerID, CustomerCode, CustomerName, Phone, Mobile, CurrentBalance FROM tblCustomer WHERE IsActive = 1";
-      const result = await sqlPool.request().query(query);
+      const correction = await autoCorrectSayanQuery(query);
+      const result = await sqlPool.request().query(correction.query);
       const responseTime = Date.now() - start;
 
       const newLog: LogEntry = {
@@ -657,7 +962,12 @@ app.get("/api/external/v1/customers", async (req, res) => {
       storage.logs.unshift(newLog);
       saveStorage(storage);
 
-      res.json({ success: true, count: result.recordset.length, data: result.recordset });
+      res.json({ 
+        success: true, 
+        count: result.recordset.length, 
+        correctedQuery: correction.query !== query ? correction.query : undefined,
+        data: result.recordset 
+      });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
     }
@@ -674,7 +984,8 @@ app.get("/api/external/v1/invoices", async (req, res) => {
   if (isDbConnected && sqlPool) {
     try {
       const query = "SELECT F.FactorNo, F.FactorDate, C.CustomerName, F.TotalPrice, F.FinalPrice FROM tblFactor F LEFT JOIN tblCustomer C ON F.CustomerID = C.CustomerID WHERE F.FactorType = 1 ORDER BY F.FactorDate DESC";
-      const result = await sqlPool.request().query(query);
+      const correction = await autoCorrectSayanQuery(query);
+      const result = await sqlPool.request().query(correction.query);
       const responseTime = Date.now() - start;
 
       const newLog: LogEntry = {
@@ -691,7 +1002,12 @@ app.get("/api/external/v1/invoices", async (req, res) => {
       storage.logs.unshift(newLog);
       saveStorage(storage);
 
-      res.json({ success: true, count: result.recordset.length, data: result.recordset });
+      res.json({ 
+        success: true, 
+        count: result.recordset.length, 
+        correctedQuery: correction.query !== query ? correction.query : undefined,
+        data: result.recordset 
+      });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
     }
@@ -706,8 +1022,14 @@ app.get("/api/external/v1/goods", async (req, res) => {
   if (isDbConnected && sqlPool) {
     try {
       const query = "SELECT G.GoodsCode, G.GoodsName, G.SalePrice, S.StockCount FROM tblGoods G LEFT JOIN tblStock S ON G.GoodsID = S.GoodsID";
-      const result = await sqlPool.request().query(query);
-      res.json({ success: true, count: result.recordset.length, data: result.recordset });
+      const correction = await autoCorrectSayanQuery(query);
+      const result = await sqlPool.request().query(correction.query);
+      res.json({ 
+        success: true, 
+        count: result.recordset.length, 
+        correctedQuery: correction.query !== query ? correction.query : undefined,
+        data: result.recordset 
+      });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
     }

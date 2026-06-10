@@ -76,10 +76,51 @@ export default function App() {
   const [queryConsole, setQueryConsole] = useState("SELECT * FROM tblCustomer WHERE CurrentBalance > 100000000;");
   const [queryResult, setQueryResult] = useState<any>(null);
   const [queryLoading, setQueryLoading] = useState(false);
+  const [forceReal, setForceReal] = useState(true);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Discovery State for MSSQL
+  const [discoveryData, setDiscoveryData] = useState<{
+    success: boolean;
+    currentDb: string;
+    databases: string[];
+    tables: string[];
+    error?: string;
+  } | null>(null);
+  const [discoveryLoading, setDiscoveryLoading] = useState(false);
+
+  // Helper to fetch JSON safely verifying content type to prevent non-JSON/HTML crashes
+  const fetchJson = async (url: string) => {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        return await res.json();
+      }
+      return null;
+    } catch (e) {
+      console.warn(`Safe fetch failed for ${url}:`, e);
+      return null;
+    }
+  };
+
+  const fetchDiscovery = async () => {
+    setDiscoveryLoading(true);
+    try {
+      const data = await fetchJson("/api/gateway/discover");
+      if (data) {
+        setDiscoveryData(data);
+      }
+    } catch (e) {
+      console.error("Error fetching discovery metadata", e);
+    } finally {
+      setDiscoveryLoading(false);
+    }
+  };
 
   // New Custom Query Form
   const [newQueryName, setNewQueryName] = useState("");
@@ -92,9 +133,10 @@ export default function App() {
     setRefreshing(true);
     try {
       // Fetch Status
-      const statusRes = await fetch("/api/gateway/status");
-      if (statusRes.ok) {
-        const statusData = await statusRes.json();
+      const statusData = await fetchJson("/api/gateway/status");
+      let currentDbConnected = false;
+      if (statusData) {
+        currentDbConnected = statusData.dbConnected;
         // convert uptime to readable
         const hours = Math.floor(statusData.uptime / 3600);
         const mins = Math.floor((statusData.uptime % 3600) / 60);
@@ -108,32 +150,34 @@ export default function App() {
         });
       }
 
+      if (currentDbConnected) {
+        await fetchDiscovery();
+      } else {
+        setDiscoveryData(null);
+      }
+
       // Fetch Config
-      const configRes = await fetch("/api/gateway/config");
-      if (configRes.ok) {
-        const configData = await configRes.json();
+      const configData = await fetchJson("/api/gateway/config");
+      if (configData) {
         setDbConfig(configData.dbConfig);
         setLocalConfig(configData.localConfig);
       }
 
       // Fetch Keys
-      const keysRes = await fetch("/api/gateway/keys");
-      if (keysRes.ok) {
-        const keysData = await keysRes.json();
+      const keysData = await fetchJson("/api/gateway/keys");
+      if (keysData) {
         setApiKeys(keysData);
       }
 
       // Fetch Queries
-      const queriesRes = await fetch("/api/gateway/queries");
-      if (queriesRes.ok) {
-        const queriesData = await queriesRes.json();
+      const queriesData = await fetchJson("/api/gateway/queries");
+      if (queriesData) {
         setQueries(queriesData);
       }
 
       // Fetch Logs
-      const logsRes = await fetch("/api/gateway/logs");
-      if (logsRes.ok) {
-        const logsData = await logsRes.json();
+      const logsData = await fetchJson("/api/gateway/logs");
+      if (logsData) {
         setLogs(logsData);
       }
 
@@ -274,7 +318,7 @@ export default function App() {
       const res = await fetch("/api/gateway/query/test", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ queryText: queryConsole })
+        body: JSON.stringify({ queryText: queryConsole, forceRealConnection: forceReal })
       });
       const data = await res.json();
       setQueryResult(data);
@@ -702,56 +746,140 @@ export default function App() {
               >
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                   
-                  {/* Left panel: Catalog of Sayan Tables */}
-                  <div className="lg:col-span-1 bg-[#18181b] border border-[#27272a] rounded-xl p-4 space-y-3">
-                    <h3 className="font-semibold text-white flex items-center gap-2 text-xs border-b border-[#27272a] pb-2">
-                      <Database className="w-4 h-4 text-blue-500" />
-                      روابط و جداول حسابداری سایان
-                    </h3>
-
-                    <div className="space-y-3 text-xs max-h-[450px] overflow-y-auto pr-1">
-                      
-                      <div className="space-y-1">
-                        <span className="font-semibold text-[#e4e4e7] font-mono text-[11px]">tblCustomer (جدول مشتریان)</span>
-                        <div className="p-2 bg-[#09090b] border border-[#27272a] rounded text-[10.5px] text-[#a1a1aa] leading-relaxed font-mono">
-                          مهم‌ترین ستون‌ها:<br />
-                          CustomerID [کلید اصلی]<br />
-                          CustomerCode [کد مشتری]<br />
-                          CustomerName [نام]<br />
-                          Phone, Mobile [ارتباطات]<br />
-                          CurrentBalance [بدهی جاری]
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <span className="font-semibold text-[#e4e4e7] font-mono text-[11px]">tblFactor (سربرگ فاکتورها)</span>
-                        <div className="p-2 bg-[#09090b] border border-[#27272a] rounded text-[10.5px] text-[#a1a1aa] leading-relaxed font-mono">
-                          مهم‌ترین ستون‌ها:<br />
-                          FactorID [کلید اصلی]<br />
-                          FactorNo [شماره فاکتور]<br />
-                          FactorDate [تاریخ شمسی]<br />
-                          CustomerID [آی‌دی مشتری]<br />
-                          TotalPrice, FinalPrice [ارقام]
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <span className="font-semibold text-[#e4e4e7] font-mono text-[11px]">tblGoods (لیست کالاها)</span>
-                        <div className="p-2 bg-[#09090b] border border-[#27272a] rounded text-[10.5px] text-[#a1a1aa] leading-relaxed font-mono">
-                          مهم‌ترین ستون‌ها:<br />
-                          GoodsID, GoodsCode, GoodsName, Unit, SalePrice
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <span className="font-semibold text-[#e4e4e7] font-mono text-[11px]">tblStock (موجودی انبار)</span>
-                        <div className="p-2 bg-[#09090b] border border-[#27272a] rounded text-[10.5px] text-[#a1a1aa] leading-relaxed font-mono">
-                          مهم‌ترین ستون‌ها:<br />
-                          GoodsID, WarehouseID, StockCount
-                        </div>
-                      </div>
-
+                  {/* Left panel: Catalog of Sayan Tables or SQL Discovery */}
+                  <div className="lg:col-span-1 bg-[#18181b] border border-[#27272a] rounded-xl p-4 space-y-4">
+                    <div className="border-b border-[#27272a] pb-2 flex items-center justify-between">
+                      <h3 className="font-semibold text-white flex items-center gap-2 text-xs">
+                        <Database className="w-4 h-4 text-blue-500" />
+                        ساختار و جداول دیتابیس سایان
+                      </h3>
+                      {status.dbConnected && (
+                        <button 
+                          onClick={fetchDiscovery}
+                          disabled={discoveryLoading}
+                          title="بروزرسانی جداول و پایگاه‌داده‌ها"
+                          className="p-1 hover:bg-[#27272a] rounded text-[#a1a1aa] transition-colors cursor-pointer"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${discoveryLoading ? 'animate-spin' : ''}`} />
+                        </button>
+                      )}
                     </div>
+
+                    {status.dbConnected && discoveryData?.success ? (
+                      <div className="space-y-4 text-xs">
+                        {/* List of other Databases */}
+                        <div className="space-y-1.5">
+                          <span className="font-semibold text-[#a1a1aa] text-[11px] block">
+                            پایگاه‌داده‌های یافت‌شده روی سرور:
+                          </span>
+                          <div className="flex flex-wrap gap-1 max-h-[100px] overflow-y-auto pr-1">
+                            {discoveryData.databases?.map((dbName: string, idx: number) => {
+                              const isActive = dbName.toLowerCase() === dbConfig.database.toLowerCase();
+                              return (
+                                <button
+                                  key={idx}
+                                  onClick={() => {
+                                    // Set name in form
+                                    setDbConfig(prev => ({ ...prev, database: dbName }));
+                                    // Provide help on console
+                                    setQueryConsole(`-- تغییر به دیتابیس ${dbName} در موتور SQL\nSELECT TOP 10 * FROM [${dbName}].INFORMATION_SCHEMA.TABLES;`);
+                                  }}
+                                  className={`px-2 py-0.5 rounded text-[10px] font-mono border transition-all cursor-pointer ${
+                                    isActive
+                                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                                      : "bg-[#09090b] border-[#27272a] text-[#71717a] hover:text-[#e4e4e7] hover:border-[#3f3f46]"
+                                  }`}
+                                  title="روی این دیتابیس کلیک کرده و سپس در تب تنظیمات آن را ذخیره کنید."
+                                >
+                                  {dbName}
+                                </button>
+                              );
+                            })}
+                          </div>
+                          <p className="text-[9.5px] text-[#71717a] leading-relaxed">
+                            💡 راهنما: برای جابجایی دیتابیس غول‌پیکر (مثلاً <span className="text-amber-200">{`LepanBaft`}</span> یا پسوندهای اختصاصی)، آن را کلیک کرده و از زبانه <strong className="text-[#a1a1aa]">تنظیمات سرور</strong> ذخیره کنید.
+                          </p>
+                        </div>
+
+                        {/* List of physical tables in the current DB */}
+                        <div className="space-y-1.5 pt-2 border-t border-[#27272a]/70">
+                          <span className="font-semibold text-[#a1a1aa] text-[11px] flex justify-between">
+                            <span>جداول فیزیکی کشف شده:</span>
+                            <span className="text-blue-400 font-mono">({discoveryData.tables?.length || 0})</span>
+                          </span>
+                          <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1 font-mono text-[10.5px]">
+                            {discoveryData.tables?.length === 0 ? (
+                              <div className="text-[#71717a] text-center py-2">
+                                جدولی یافت نشد. به نظر می‌رسد جدول ارگانیک وجود ندارد یا دسترسی یوزر محدود است.
+                              </div>
+                            ) : (
+                              discoveryData.tables?.map((tblName: string, idx: number) => {
+                                // check common Sayan names
+                                const nameLower = tblName.toLowerCase();
+                                const isCustomer = nameLower.includes("customer") || nameLower.includes("cust") || nameLower.includes("moshtari") || nameLower.includes("person");
+                                const isFactor = nameLower.includes("factor") || nameLower.includes("invoice") || nameLower.includes("sanad");
+                                const isGoods = nameLower.includes("goods") || nameLower.includes("kala") || nameLower.includes("stock") || nameLower.includes("anbar");
+                                return (
+                                  <div
+                                    key={idx}
+                                    onClick={() => setQueryConsole(`SELECT TOP 100 * FROM [${tblName}];`)}
+                                    className="flex items-center justify-between p-1.5 bg-[#09090b] hover:bg-[#1c1c1f] hover:border-[#3f3f46] border border-[#27272a] rounded cursor-pointer transition-colors"
+                                    title="کلیک برای پیش‌نویس دستور دریافت کل جدول"
+                                  >
+                                    <span className="text-[#e4e4e7] truncate text-[10px]" dir="ltr">{tblName}</span>
+                                    {isCustomer && (
+                                      <span className="text-[9px] px-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded">مشتریان</span>
+                                    )}
+                                    {isFactor && (
+                                      <span className="text-[9px] px-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded">فاکتورها</span>
+                                    )}
+                                    {isGoods && (
+                                      <span className="text-[9px] px-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded">کالا/انبار</span>
+                                    )}
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                        </div>
+
+                      </div>
+                    ) : (
+                      <div className="space-y-3 text-xs">
+                        <div className="text-[11px] text-[#a1a1aa] bg-[#27272a]/20 p-2.5 rounded border border-[#27272a] leading-relaxed">
+                          <p className="text-amber-300 font-semibold mb-1">⚠️ پایگاه داده تستی (آفلاین):</p>
+                          <span className="text-[10px] leading-relaxed block text-justify">
+                            در حالت شبیه‌ساز ماکت جداول پیش‌فرض استاندارد سایان (مشتریان، فاکتورها، انبارداری) آماده تست وب‌سایت شماست. محض اتصال حقیقی دیتابیس MSSQL، جداول بیزنس شما در این بخش قرائت می‌شوند.
+                          </span>
+                        </div>
+
+                        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                          <div className="space-y-1">
+                            <span className="font-semibold text-[#e4e4e7] font-mono text-[11px]">tblCustomer (جدول مشتریان)</span>
+                            <div className="p-2 bg-[#09090b] border border-[#27272a] rounded text-[10.5px] text-[#a1a1aa] leading-relaxed font-mono">
+                              CustomerID [شناسه مشتری]<br />
+                              CustomerCode [کد مشتری]<br />
+                              CustomerName [نام مشتری]<br />
+                              CurrentBalance [مانده حساب]
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="font-semibold text-[#e4e4e7] font-mono text-[11px]">tblFactor (جدول فاکتورها)</span>
+                            <div className="p-2 bg-[#09090b] border border-[#27272a] rounded text-[10.5px] text-[#a1a1aa] leading-relaxed font-mono">
+                              FactorID, FactorNo, FactorDate, CustomerID, TotalPrice
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="font-semibold text-[#e4e4e7] font-mono text-[11px]">tblGoods (جدول کالاها)</span>
+                            <div className="p-2 bg-[#09090b] border border-[#27272a] rounded text-[10.5px] text-[#a1a1aa] leading-relaxed font-mono">
+                              GoodsID, GoodsCode, GoodsName, SalePrice
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Right panel: Editor and Terminal */}
@@ -798,24 +926,41 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center bg-[#09090b] p-3 rounded-lg border border-[#27272a]">
-                        <div className="text-xs text-slate-400">
-                          {status.dbConnected ? (
-                            <span className="text-emerald-400 flex items-center gap-1">
-                              <Check className="w-3.5 h-3.5" />
-                              آماده اجرا روی پایگاه داده زنده سایان
-                            </span>
-                          ) : (
-                            <span className="text-amber-400 flex items-center gap-1 font-semibold">
-                              <AlertCircle className="w-3.5 h-3.5" />
-                              حالت شبیه‌ساز (آفلاین): کوئری روی حافظه مجازی اجرا می‌شود
-                            </span>
-                          )}
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#09090b] p-3 rounded-lg border border-[#27272a] gap-3">
+                        <div className="space-y-1">
+                          <div className="text-xs text-slate-400">
+                            {status.dbConnected ? (
+                              <span className="text-emerald-400 flex items-center gap-1 font-medium">
+                                <Check className="w-3.5 h-3.5" />
+                                آماده اجرا روی پایگاه داده زنده سایان
+                              </span>
+                            ) : forceReal ? (
+                              <span className="text-rose-400 flex items-center gap-1 font-semibold">
+                                <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
+                                تلاش برای تست حقیقی فیزیکی دیتابیس (بدون شبیه‌ساز)
+                              </span>
+                            ) : (
+                              <span className="text-amber-400 flex items-center gap-1 font-semibold">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                حالت شبیه‌ساز (آفلاین): کوئری روی حافظه مجازی اجرا می‌شود
+                              </span>
+                            )}
+                          </div>
+                          
+                          <label className="flex items-center gap-2 cursor-pointer select-none text-[10.5px] text-[#a1a1aa] hover:text-[#e4e4e7] transition-colors pt-1">
+                            <input
+                              type="checkbox"
+                              checked={forceReal}
+                              onChange={(e) => setForceReal(e.target.checked)}
+                              className="w-3.5 h-3.5 rounded bg-[#1c1c1f] border-[#27272a] text-blue-600 focus:ring-0 checked:bg-blue-600 cursor-pointer"
+                            />
+                            <span className="font-semibold text-blue-400">⚡ الزامی کردن اجرای مستقیم روی پایگاه داده زنده سایان</span>
+                          </label>
                         </div>
                         <button
                           onClick={handleRunTestQuery}
                           disabled={queryLoading}
-                          className="px-4 py-2 hover:opacity-90 disabled:opacity-50 text-[11px] font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+                          className="px-4 py-2 hover:opacity-90 disabled:opacity-50 text-[11px] font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded transition-colors flex items-center gap-2 cursor-pointer shadow-sm shrink-0"
                         >
                           {queryLoading ? (
                             <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
@@ -866,6 +1011,22 @@ export default function App() {
 
                         {queryResult && queryResult.success && (
                           <div className="space-y-3">
+                            {queryResult.corrections && (
+                              <div className="p-3 bg-blue-500/10 border border-blue-500/20 text-blue-300 text-[10.5px] rounded-lg space-y-1" dir="rtl">
+                                <span className="font-semibold block text-blue-400">⚡ هماهنگ‌سازی و اصلاح هوشمند ساختار دیتابیس سایان:</span>
+                                <ul className="list-disc list-inside space-y-1 text-blue-300/90 text-[10px]">
+                                  {queryResult.corrections.map((corr: string, idx: number) => (
+                                    <li key={idx} className="mr-2">{corr}</li>
+                                  ))}
+                                </ul>
+                                {queryResult.correctedQuery && (
+                                  <div className="mt-2 pt-2 border-t border-blue-500/20 font-mono text-[10px] text-[#a1a1aa] break-all">
+                                    دستور نهایی اجرا شده روی دیتابیس: <span className="bg-[#09090b] px-2 py-0.5 rounded border border-[#27272a] text-[#e4e4e7]">{queryResult.correctedQuery}</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
                             {queryResult.simulated && (
                               <div className="px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] rounded inline-block">
                                 نمایش داده شده از موتور شبیه‌ساز سایان (درحالت آفلاین بانک)

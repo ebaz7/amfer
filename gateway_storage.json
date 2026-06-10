@@ -1,0 +1,79 @@
+{
+  "localConfig": {
+    "baseUrl": "http://localhost:5000/api/v1",
+    "token": "Bearer eYJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "useProxy": true
+  },
+  "dbConfig": {
+    "host": "127.0.0.1",
+    "port": 1433,
+    "database": "SayanAccDB",
+    "user": "sa",
+    "pass": "",
+    "encrypt": false,
+    "trustServerCertificate": true
+  },
+  "keys": [
+    {
+      "id": "key-1",
+      "name": "کانال وب‌سایت اصلی شرکت",
+      "key": "s_gate_live_73f08a91b2c",
+      "status": "active",
+      "createdAt": "2026-06-10T07:22:06.507Z",
+      "scope": "all",
+      "requestCount": 142
+    },
+    {
+      "id": "key-2",
+      "name": "اپلیکیشن موبایل فروشگاهی",
+      "key": "s_gate_live_94ea12cb40f",
+      "status": "active",
+      "createdAt": "2026-06-10T07:22:06.507Z",
+      "scope": "readonly",
+      "requestCount": 38
+    }
+  ],
+  "queries": [
+    {
+      "id": "q-sales-invoices",
+      "name": "لیست فاکتورهای فروش اخیر",
+      "queryText": "SELECT TOP 100 F.FactorNo, F.FactorDate, C.CustomerName, F.TotalPrice, F.FinalPrice FROM tblFactor F LEFT JOIN tblCustomer C ON F.CustomerID = C.CustomerID WHERE F.FactorType = 1 ORDER BY F.FactorDate DESC",
+      "description": "برگرداندن آخرین فاکتورهای صادر شده همراه با نام مشتری و مبلغ کل",
+      "category": "فروش",
+      "isCustom": false
+    },
+    {
+      "id": "q-customers-balances",
+      "name": "مانده حساب مشتریان بدهکار/بستانکار",
+      "queryText": "SELECT CustomerID, CustomerCode, CustomerName, Phone, Mobile, CurrentBalance FROM tblCustomer WHERE IsActive = 1 ORDER BY CurrentBalance DESC",
+      "description": "لیست کامل مشتریان فعال به همراه کد، شماره موبایل و تفصیلی تراز مالی جاری",
+      "category": "مشتریان",
+      "isCustom": false
+    },
+    {
+      "id": "q-warehouse-stock",
+      "name": "کالاهای انبار و آخرین موجودی",
+      "queryText": "SELECT G.GoodsCode, G.GoodsName, G.SalePrice, W.WarehouseName, S.StockCount FROM tblGoods G LEFT JOIN tblStock S ON G.GoodsID = S.GoodsID LEFT JOIN tblWarehouse W ON S.WarehouseID = W.WarehouseID WHERE S.StockCount > 0",
+      "description": "گزارش موجودی کالاهای فعال کشور در انبارهای مختلف همراه با قیمت ترجیحی فروش",
+      "category": "انبارداری",
+      "isCustom": false
+    },
+    {
+      "id": "q-accounting-ledger",
+      "name": "ریز تراکنش‌های اسناد حسابداری",
+      "queryText": "SELECT TOP 150 D.SanadNo, H.SanadDate, D.DebitAmount, D.CreditAmount, D.Description FROM tblSanadDetail D LEFT JOIN tblSanadHeader H ON D.SanadID = H.SanadID ORDER BY H.SanadDate DESC",
+      "description": "لیست آخرین اقلام اسناد حسابداری ثبت شده در دفتر کل و معین سایان",
+      "category": "حسابداری",
+      "isCustom": false
+    },
+    {
+      "id": "q-test-connection",
+      "name": "تست عمومی سرور و صحت اتصال (فول‌پروف - بدون نیاز به جدول)",
+      "queryText": "SELECT DB_NAME() AS [Active_Database], @@VERSION AS [SQL_Server_Version], GETDATE() AS [Server_Time]",
+      "description": "صرفاً جهت راستی‌آزمایی فیزیکی پورت، آی‌پی و دسترسی کاربر بدون وابستگی به ساختار جداول سایان",
+      "category": "حسابداری",
+      "isCustom": false
+    }
+  ],
+  "logs": []
+}
