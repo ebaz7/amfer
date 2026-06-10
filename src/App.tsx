@@ -26,7 +26,8 @@ import {
   Car,
   TrendingUp,
   Cpu,
-  Download
+  Download,
+  BookOpen
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
@@ -40,7 +41,7 @@ import {
 
 export default function App() {
   // Navigation State
-  const [activeTab, setActiveTab ] = useState<"dashboard" | "keys" | "playground" | "config" | "installer">("dashboard");
+  const [activeTab, setActiveTab ] = useState<"dashboard" | "keys" | "playground" | "config" | "installer" | "api-docs">("dashboard");
 
   // State
   const [status, setStatus] = useState<SystemStatus>({
@@ -95,6 +96,7 @@ export default function App() {
     currentDb: string;
     databases: string[];
     tables: string[];
+    views?: string[];
     error?: string;
   } | null>(null);
   const [discoveryLoading, setDiscoveryLoading] = useState(false);
@@ -519,7 +521,7 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab("installer")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium transition duration-150 cursor-pointer mr-auto ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium transition duration-150 cursor-pointer ${
               activeTab === "installer"
                 ? "bg-[#27272a] text-emerald-400 border border-emerald-500/20 shadow-sm"
                 : "text-emerald-400 hover:bg-emerald-950/15"
@@ -527,6 +529,18 @@ export default function App() {
           >
             <Code className="w-3.5 h-3.5" />
             <span>آموزش نصب روی سرور (CMD Setup)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("api-docs")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium transition duration-150 cursor-pointer mr-auto ${
+              activeTab === "api-docs"
+                ? "bg-[#27272a] text-blue-400 border border-blue-500/20 shadow-sm"
+                : "text-blue-400 hover:bg-blue-950/15"
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>مستندات اتصال (Developer API)</span>
           </button>
         </nav>
 
@@ -1391,6 +1405,33 @@ export default function App() {
                           </div>
                         </div>
 
+                        {/* List of views in the current DB */}
+                        {discoveryData.views && discoveryData.views.length > 0 && (
+                          <div className="space-y-1.5 pt-2 border-t border-[#27272a]/70">
+                            <span className="font-semibold text-[#a1a1aa] text-[11px] flex justify-between">
+                              <span>نماهای اطلاعاتی (Views):</span>
+                              <span className="text-emerald-400 font-mono">({discoveryData.views.length})</span>
+                            </span>
+                            <div className="space-y-1 max-h-[150px] overflow-y-auto pr-1 font-mono text-[10.5px]">
+                              {discoveryData.views.map((viewName: string, idx: number) => {
+                                return (
+                                  <div
+                                    key={`v-${idx}`}
+                                    onClick={() => setQueryConsole(`SELECT TOP 100 * FROM [${viewName}];`)}
+                                    className="flex items-center justify-between p-1.5 bg-[#09090b] hover:bg-[#1c1c1f] hover:border-[#3f3f46] border border-[#27272a] rounded cursor-pointer transition-colors"
+                                  >
+                                    <span className="text-emerald-400/80 text-[10px] truncate" dir="ltr">{viewName}</span>
+                                    <Database className="w-3 h-3 text-emerald-500/50" />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <p className="text-[9.5px] text-[#71717a] py-1 leading-relaxed">
+                              نکته: در نرم‌افزارهایی مثل سایان معمولاً ساختار واقعی جداول کدگذاری شده در قالب ویوها (مثلاً vw_Customer) تعریف می‌شود. شما می‌توانید از آن‌ها به جای جداول خام استفاده کنید.
+                            </p>
+                          </div>
+                        )}
+
                       </div>
                     ) : (
                       <div className="space-y-3 text-xs">
@@ -2204,6 +2245,148 @@ export default function App() {
 
                 </div>
 
+              </motion.div>
+            )}
+
+            {/* ======= TAB 6: API DOCS ====== */}
+            {activeTab === "api-docs" && (
+              <motion.div
+                key="api-docs"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.2 }}
+                className="max-w-4xl mx-auto space-y-4 text-xs"
+              >
+                <div className="bg-[#09090b] border border-[#27272a] rounded-xl p-5 md:p-8 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-transparent opacity-20"></div>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-2">
+                        <BookOpen className="w-5 h-5 text-blue-400" />
+                        <span>راهنمای اتصال نرم‌افزارهای خارجی (REST API)</span>
+                      </h2>
+                      <p className="text-[#a1a1aa] leading-relaxed text-xs">
+                        شما می‌توانید از طریق این راهنما، سایر اپلیکیشن‌ها (مانند ربات تلگرام، سایت فروشگاهی، یا مینی‌اپ‌ها) را به طور مستقیم و ایمن به دیتابیس سایان متصل کنید. تمامی درخواست‌ها از طریق همین دروازه پردازش شده و به SQL ارسال می‌شوند.
+                      </p>
+                    </div>
+
+                    <div className="space-y-4">
+                      
+                      {/* Section 1: Authentication */}
+                      <div className="bg-[#18181b] border border-[#27272a] rounded-lg p-4 space-y-3">
+                        <h3 className="text-[13px] font-bold text-white flex items-center gap-2">
+                          <Lock className="w-4 h-4 text-emerald-400" />
+                          <span>احراز هویت (Authentication)</span>
+                        </h3>
+                        <p className="text-xs text-[#a1a1aa]">
+                          برای ارسال درخواست به سرور، باید ابتدا از زبانه <strong className="text-white">کلیدهای API شبکه‌ای</strong> یک کلید بسازید و آن را در هدر درخواست یا به عنوان پارامتر ارسال کنید.
+                        </p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="bg-[#09090b] p-3 rounded border border-[#27272a]">
+                            <span className="block text-[#e4e4e7] mb-2 font-bold">روش اول: Header (پیشنهادی)</span>
+                            <pre className="text-emerald-400 font-mono text-[10px] break-words" dir="ltr">
+Authorization: Bearer s_gate_live_xyz...
+                            </pre>
+                          </div>
+                          <div className="bg-[#09090b] p-3 rounded border border-[#27272a]">
+                            <span className="block text-[#e4e4e7] mb-2 font-bold">روش دوم: Query Param</span>
+                            <pre className="text-blue-400 font-mono text-[10px] break-words whitespace-pre-wrap" dir="ltr">
+GET /api/external/v1/customers?apiKey=s_gate_live_xyz...
+                            </pre>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Section 2: Standard Endpoints */}
+                      <div className="bg-[#18181b] border border-[#27272a] rounded-lg p-4 space-y-3">
+                        <h3 className="text-[13px] font-bold text-emerald-400 flex items-center gap-2 mb-4">
+                          <Server className="w-4 h-4" />
+                          <span>اندپوینت‌های استاندارد (Standard API)</span>
+                        </h3>
+                        
+                        <div className="space-y-4">
+                          {/* Customers */}
+                          <div className="border border-[#27272a] rounded-md overflow-hidden">
+                            <div className="bg-[#09090b] p-2.5 flex items-center gap-3 border-b border-[#27272a]">
+                              <span className="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-bold">GET</span>
+                              <span className="font-mono text-white text-[11px] font-bold" dir="ltr">/api/external/v1/customers</span>
+                            </div>
+                            <div className="p-3 bg-[#18181b]">
+                              <p className="text-[#a1a1aa] mb-2">دریافت لیست اشخاص فعال، مشتریان و اطلاعات تماس به همراه مانده ریالی.</p>
+                            </div>
+                          </div>
+
+                          {/* Goods */}
+                          <div className="border border-[#27272a] rounded-md overflow-hidden">
+                            <div className="bg-[#09090b] p-2.5 flex items-center gap-3 border-b border-[#27272a]">
+                              <span className="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-bold">GET</span>
+                              <span className="font-mono text-white text-[11px] font-bold" dir="ltr">/api/external/v1/goods</span>
+                            </div>
+                            <div className="p-3 bg-[#18181b]">
+                              <p className="text-[#a1a1aa] mb-2">دریافت لیست کالاها، قیمت پایه فروش و موجودی انبارها.</p>
+                            </div>
+                          </div>
+
+                          {/* Invoices */}
+                          <div className="border border-[#27272a] rounded-md overflow-hidden">
+                            <div className="bg-[#09090b] p-2.5 flex items-center gap-3 border-b border-[#27272a]">
+                              <span className="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-bold">GET</span>
+                              <span className="font-mono text-white text-[11px] font-bold" dir="ltr">/api/external/v1/invoices</span>
+                            </div>
+                            <div className="p-3 bg-[#18181b]">
+                              <p className="text-[#a1a1aa] mb-2">دریافت فاکتورهای فروش (FactorType = 1) به صورت Left Join با اطلاعات خریدار.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Section 3: Dynamic SQL Query Endpoint */}
+                      <div className="bg-[#18181b] border border-blue-500/30 rounded-lg p-4 space-y-3">
+                        <h3 className="text-[13px] font-bold text-blue-400 flex items-center gap-2 mb-2">
+                          <Terminal className="w-4 h-4" />
+                          <span>اجرای مستقیم کوئری SQL (Dynamic Query)</span>
+                        </h3>
+                        <p className="text-[#a1a1aa] text-xs leading-relaxed">
+                          با استفاده از این اندپوینت می‌توانید برای نیازهای خاص، هرگونه دستور <code className="text-emerald-400 mx-1">SELECT</code> را مستقیماً به دیتابیس سایان ارسال کنید. (نکته: برای این کار باید در زمان ساخت کلید، سطح دسترسی آن را روی <strong className="text-white">امکانات کامل + کوئری آزاد</strong> تنظیم کرده باشید).
+                        </p>
+                        
+                        <div className="border border-[#27272a] rounded-md overflow-hidden mt-3">
+                          <div className="bg-[#09090b] p-2.5 flex items-center gap-3 border-b border-[#27272a]">
+                            <span className="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">POST</span>
+                            <span className="font-mono text-white text-[11px] font-bold" dir="ltr">/api/external/v1/query</span>
+                          </div>
+                          <div className="p-3 bg-[#18181b] flex flex-col md:flex-row gap-4">
+                            <div className="flex-1 space-y-2">
+                              <span className="text-[#e4e4e7] block font-bold">نمونه JSON ارسالی (Body):</span>
+                              <pre className="bg-[#09090b] p-3 rounded border border-[#27272a] text-amber-300 font-mono text-[10px] whitespace-pre-wrap" dir="ltr">
+{`{
+  "query": "SELECT TOP 10 * FROM tblCustomer WHERE Mobile LIKE '09%';"
+}`}
+                              </pre>
+                            </div>
+                            <div className="flex-1 space-y-2">
+                              <span className="text-[#e4e4e7] block font-bold">نمونه JSON دریافتی (Response):</span>
+                              <pre className="bg-[#09090b] p-3 rounded border border-[#27272a] text-emerald-300 font-mono text-[10px] whitespace-pre-wrap" dir="ltr">
+{`{
+  "success": true,
+  "recordCount": 10,
+  "data": [
+    { "CustomerID": 1, ... }
+  ],
+  "responseTime": 45
+}`}
+                              </pre>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             )}
 

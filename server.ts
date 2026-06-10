@@ -450,6 +450,12 @@ app.get("/api/gateway/discover", async (req, res) => {
     );
     const tables = tablesResult.recordset.map((r: any) => r.TABLE_NAME);
 
+    // 2.5 Get views
+    const viewsResult = await sqlPool.request().query(
+      "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS ORDER BY TABLE_NAME;"
+    );
+    const views = viewsResult.recordset.map((r: any) => r.TABLE_NAME);
+
     // 3. Active database name
     const currentDbResult = await sqlPool.request().query("SELECT DB_NAME() AS current_db;");
     const currentDb = currentDbResult.recordset[0]?.current_db || "";
@@ -458,7 +464,8 @@ app.get("/api/gateway/discover", async (req, res) => {
       success: true,
       currentDb,
       databases,
-      tables
+      tables,
+      views
     });
   } catch (err: any) {
     res.json({
