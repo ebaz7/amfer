@@ -1,0 +1,6 @@
+{
+  "name": "Sayan Gateway & Management Panel",
+  "description": "پیشرفته‌ترین هاب و پنل مدیریت واسط برای متصل کردن نرم‌افزار حسابداری سایان به وب‌سایت‌ها و اپلیکیشن‌ها از طریق کلیدهای API امن و کوئری‌های SQL Server",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
