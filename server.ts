@@ -497,8 +497,11 @@ app.get("/api/gateway/reports/:reportKey", async (req, res) => {
 
   if (storage.localConfig.useProxy && storage.localConfig.baseUrl) {
     try {
-      const cleanBase = storage.localConfig.baseUrl.replace(/\/$/, "");
-      const hasPrefixApi = cleanBase.toLowerCase().endsWith("/api") || cleanBase.toLowerCase().endsWith("/api/v1");
+      let cleanBase = storage.localConfig.baseUrl.replace(/\/$/, "");
+      cleanBase = cleanBase.replace('localhost', '127.0.0.1');
+      if (cleanBase.endsWith('/v1')) cleanBase = cleanBase.substring(0, cleanBase.length - 3);
+      
+      const hasPrefixApi = cleanBase.toLowerCase().endsWith("/api");
       const apiPrefix = hasPrefixApi ? "" : "/api";
       const targetUrl = cleanBase + apiPrefix + resourcePath;
 
@@ -632,6 +635,9 @@ app.get("/api/gateway/reports/:reportKey", async (req, res) => {
   }
 
   // 2. If Direct SQL server database connection is ON
+  let sqlFailed = false;
+  let sqlErrorMsg = "";
+
   if (isDbConnected && sqlPool) {
     try {
       const correction = await autoCorrectSayanQuery(sqlQuery);
@@ -665,6 +671,10 @@ app.get("/api/gateway/reports/:reportKey", async (req, res) => {
         info: `اطلاعات گزارش مستقیماً از MS SQL Server متصل به دیتابیس سایان استخراج شد.` + (proxyFailed ? ` (حالت پراکسی وب سرویس دچار خطا شد: ${proxyErrorMsg})` : "")
       });
     } catch (err: any) {
+      console.warn(`Direct SQL query failed for report: ${reportName}`, err.message);
+      sqlFailed = true;
+      sqlErrorMsg = err.message;
+
       const responseTime = Date.now() - start;
       const newLog: LogEntry = {
         id: "log-" + Math.random().toString(36).substring(2, 9),
@@ -680,11 +690,13 @@ app.get("/api/gateway/reports/:reportKey", async (req, res) => {
       };
       storage.logs.unshift(newLog);
       saveStorage(storage);
-
+      
+      // Return the SQL error explicitly so the user can troubleshoot the table/permissions issue!
       return res.status(500).json({
         success: false,
         source: "sql-direct",
-        error: `خطا در اجرای کوئری دیتابیس مستقیم سایان: ${err.message}`,
+        error: `خطای اس‌کیوال دیتابیس: ${err.message}`,
+        hint: "نام جداول یا ستون‌ها ممکن است با کوئری پیش‌فرض سیستم مطابقت نداشته باشد، یا کاربر دیتابیس سطح دسترسی خواندن جداول را ندارد.",
         responseTime
       });
     }
@@ -954,8 +966,11 @@ app.post("/api/gateway/query/test", async (req, res) => {
 
   if (storage.localConfig.useProxy && storage.localConfig.baseUrl) {
     try {
-      const cleanBase = storage.localConfig.baseUrl.replace(/\/$/, "");
-      const hasPrefixApi = cleanBase.toLowerCase().endsWith("/api") || cleanBase.toLowerCase().endsWith("/api/v1");
+      let cleanBase = storage.localConfig.baseUrl.replace(/\/$/, "");
+      cleanBase = cleanBase.replace('localhost', '127.0.0.1');
+      if (cleanBase.endsWith('/v1')) cleanBase = cleanBase.substring(0, cleanBase.length - 3);
+      
+      const hasPrefixApi = cleanBase.toLowerCase().endsWith("/api");
       const apiPrefix = hasPrefixApi ? "" : "/api";
       
       const normQuery = queryText.toLowerCase();
