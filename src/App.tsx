@@ -340,23 +340,12 @@ export default function App() {
     setBiLoading(true);
     setBiResult(null);
     setSelectedBiReport(reportKey);
-    let queryText = "";
-    
-    if (reportKey === "customers") {
-      queryText = "SELECT TOP 100 CustomerCode AS [کد مشتری], CustomerName AS [نام مشتری/همکار], CurrentBalance AS [مانده ریالی], Phone AS [تلفن تماس] FROM tblCustomer WHERE CurrentBalance != 0 ORDER BY ABS(CurrentBalance) DESC;";
-    } else if (reportKey === "goods") {
-      queryText = "SELECT TOP 100 GoodsCode AS [کد کالا], GoodsName AS [نام کالا], SalePrice AS [قیمت واحد کالا], StockCount AS [موجودی], (SalePrice * StockCount) AS [ارزش تخمینی انبار] FROM tblGoods LEFT JOIN tblStock ON tblGoods.GoodsID = tblStock.GoodsID WHERE StockCount > 0 ORDER BY StockCount DESC;";
-    } else if (reportKey === "sales") {
-      queryText = "SELECT TOP 100 F.FactorNo AS [شماره فاکتور], F.FactorDate AS [تاریخ فاکتور], C.CustomerName AS [نام خریدار], F.TotalPrice AS [جمع کل ناخالص], F.FinalPrice AS [مبلغ نهایی فاکتور] FROM tblFactor F LEFT JOIN tblCustomer C ON F.CustomerID = C.CustomerID ORDER BY F.FactorNo DESC;";
-    } else if (reportKey === "accounting") {
-      queryText = "SELECT TOP 100 D.SanadNo AS [شماره سند], H.SanadDate AS [تاریخ سند], D.DebitAmount AS [بدهکار], D.CreditAmount AS [بستانکار], D.Description AS [شرح سند] FROM tblSanadDetail D LEFT JOIN tblSanadHeader H ON D.SanadID = H.SanadID ORDER BY H.SanadDate DESC, D.SanadNo DESC;";
-    }
 
     try {
-      const res = await fetch("/api/gateway/query/test", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ queryText, forceRealConnection: true }) // Force live execution directly!
+      // Connects to the specific, production resource-focused route representing the actual enterprise report
+      const res = await fetch(`/api/gateway/reports/${reportKey}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
       });
       const data = await res.json();
       setBiResult(data);
