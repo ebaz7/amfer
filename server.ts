@@ -1297,41 +1297,69 @@ app.post("/api/gateway/query/test", async (req, res) => {
 // --- EXTERNAL PLUGGABLE REST APIS FOR THIRD-PARTY APPS ---
 // Route pattern: `/api/external/v1/reports/:reportId` or generic queries with SQL
 
-app.all("/api/external/v1/*", async (req, res, next) => {
-  // 1. Authenticate Request
-  // Support both "Authorization: Bearer <API_KEY>" header AND URL query parameter "?apiKey=<API_KEY>"
-  let providedKey = "";
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
-    providedKey = req.headers.authorization.substring(7);
-  } else if (req.query.apiKey) {
-    providedKey = String(req.query.apiKey);
-  }
+// 0. Base Connectivity Check (No Auth needed) - Use this to test if IP/Port is accessible
+app.get("/api/external/v1/ping", (req, res) => {
+  const log: LogEntry = {
+    id: `ping-${Date.now()}`,
+    timestamp: new Date().toISOString(),
+    method: "GET",
+    url: req.url,
+    endpoint: "/api/external/v1/ping",
+    ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || "unknown",
+    status: 200,
+    responseTime: 0,
+    message: "تست اتصال موفقیت‌آمیز (Ping)",
+    source: "api-gateway-ping"
+  };
+  storage.logs.unshift(log);
+  if (storage.logs.length > 500) storage.logs.pop();
+  saveStorage(storage);
+  
+  res.json({ 
+    success: true, 
+    message: "اتصال به پورتال واسط سایان برقرار است",
+    serverTime: new Date().toISOString(),
+    clientIp: String(log.ip)
+  });
+});
 
-  if (!providedKey) {
-    return res.status(401).json({
-      success: false,
-      error: "Unauthorized",
-      message: "دسترسی نامعتبر. لطفاً هدر Authorization Bearer یا پارامتر آدرس apiKey معروفی ارائه کنید."
-    });
+// 1. Gateway Middleware for All Protected v1 Routes
+app.all("/api/external/v1*", async (req, res, next) => {
+  // Skip ping from auth logic
+  if (req.url.endsWith("/ping")) return next();
+
+  let providedKey = "";
+  // Check Header
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+    providedKey = req.headers.authorization.substring(7).trim();
+  } 
+  // Check alternative header
+  else if (req.headers['x-api-key']) {
+    providedKey = String(req.headers['x-api-key']).trim();
+  }
+  // Check Query Param
+  else if (req.query.apiKey) {
+    providedKey = String(req.query.apiKey).trim();
   }
 
   const foundKey = storage.keys.find((k: ApiKey) => k.key === providedKey);
   
-  // LOG THE HIT
+  // CRITICAL: Log every single attempt to the monitor
   const hitLog: LogEntry = {
-    id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+    id: `api-hit-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
     timestamp: new Date().toISOString(),
     method: req.method,
     url: req.url,
-    endpoint: req.url,
-    ip: req.ip || "unknown",
+    endpoint: req.originalUrl || req.url,
+    ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || "unknown",
     status: foundKey ? 200 : 403,
     responseTime: 0,
     message: foundKey 
-      ? `درخواست معتبر از: ${foundKey.name}` 
-      : `درخواست نامعتبر با کلید: ${providedKey.substring(0, 8)}...`,
-    source: "api-gateway"
+      ? `درخواست معتبر: ${foundKey.name}` 
+      : (providedKey ? `توکن نامعتبر (${providedKey.substring(0,6)}...)` : "درخواست بدون توکن امنیتی"),
+    source: "api-gateway-v1"
   };
+  
   storage.logs.unshift(hitLog);
   if (storage.logs.length > 500) storage.logs.pop();
   saveStorage(storage);
@@ -1339,8 +1367,8 @@ app.all("/api/external/v1/*", async (req, res, next) => {
   if (!foundKey) {
     return res.status(403).json({
       success: false,
-      error: "Forbidden",
-      message: "کلید API ارائه شده معتبر نیست یا منقضی شده است."
+      error: "Authentication Failed",
+      message: "کلید دسترسی (API Key) معتبر یافت نشد. لطفاً از هدر Authorization یا پارامتر apiKey استفاده کنید."
     });
   }
 
@@ -1348,15 +1376,15 @@ app.all("/api/external/v1/*", async (req, res, next) => {
     return res.status(403).json({
       success: false,
       error: "Key Revoked",
-      message: "این کلید API توسط مدیریت غیرفعال شده است."
+      message: "این کلید API غیرفعال شده است."
     });
   }
 
-  // Increment key request count
+  // Update statistics for the key
   foundKey.requestCount += 1;
+  foundKey.lastUsed = new Date().toISOString();
   saveStorage(storage);
 
-  // Attach key to request for endpoint handlers
   (req as any).apiKeyInfo = foundKey;
   next();
 });
