@@ -295,6 +295,24 @@ app.get("/api/gateway/status", (req, res) => {
   });
 });
 
+// Get BI Custom Queries
+app.get("/api/gateway/biconfig", (req, res) => {
+  res.json(storage.biConfig || {});
+});
+
+app.post("/api/gateway/biconfig", async (req, res) => {
+  const { reportKey, query } = req.body;
+  if (!storage.biConfig) {
+    storage.biConfig = {};
+  }
+  if (!storage.biConfig[reportKey]) {
+    storage.biConfig[reportKey] = {};
+  }
+  storage.biConfig[reportKey].query = query;
+  saveStorage(storage);
+  res.json({ success: true, biConfig: storage.biConfig });
+});
+
 // Configure Gateway Connections
 app.get("/api/gateway/config", (req, res) => {
   res.json({
@@ -471,22 +489,25 @@ app.get("/api/gateway/reports/:reportKey", async (req, res) => {
   let resourcePath = "";
   let reportName = "";
 
+  // User-defined BI Queries if any exist in storage
+  const customConfig = storage.biConfig?.[reportKey];
+
   if (reportKey === "customers") {
-    sqlQuery = "SELECT TOP 100 CustomerCode AS [کد مشتری], CustomerName AS [نام مشتری/همکار], CurrentBalance AS [مانده ریالی], Phone AS [تلفن تماس] FROM tblCustomer WHERE CurrentBalance != 0 ORDER BY ABS(CurrentBalance) DESC;";
+    sqlQuery = customConfig?.query || "SELECT TOP 100 CustomerCode AS [کد مشتری], CustomerName AS [نام مشتری/همکار], CurrentBalance AS [مانده ریالی], Phone AS [تلفن تماس] FROM tblCustomer WHERE CurrentBalance != 0 ORDER BY ABS(CurrentBalance) DESC;";
     resourcePath = "/People";
-    reportName = "مشتریان / بدهکاران و بستانکاران";
+    reportName = customConfig?.name || "مشتریان / بدهکاران و بستانکاران";
   } else if (reportKey === "goods") {
-    sqlQuery = "SELECT TOP 100 GoodsCode AS [کد کالا], GoodsName AS [نام کالا], SalePrice AS [قیمت واحد کالا], StockCount AS [موجودی], (SalePrice * StockCount) AS [ارزش تخمینی انبار] FROM tblGoods LEFT JOIN tblStock ON tblGoods.GoodsID = tblStock.GoodsID WHERE StockCount > 0 ORDER BY StockCount DESC;";
+    sqlQuery = customConfig?.query || "SELECT TOP 100 GoodsCode AS [کد کالا], GoodsName AS [نام کالا], SalePrice AS [قیمت واحد کالا], StockCount AS [موجودی], (SalePrice * StockCount) AS [ارزش تخمینی انبار] FROM tblGoods LEFT JOIN tblStock ON tblGoods.GoodsID = tblStock.GoodsID WHERE StockCount > 0 ORDER BY StockCount DESC;";
     resourcePath = "/Ware";
-    reportName = "کالاهای انباردار سایان";
+    reportName = customConfig?.name || "کالاهای انباردار سایان";
   } else if (reportKey === "sales") {
-    sqlQuery = "SELECT TOP 100 F.FactorNo AS [شماره فاکتور], F.FactorDate AS [تاریخ فاکتور], C.CustomerName AS [نام خریدار], F.TotalPrice AS [جمع کل ناخالص], F.FinalPrice AS [مبلغ نهایی فاکتور] FROM tblFactor F LEFT JOIN tblCustomer C ON F.CustomerID = C.CustomerID ORDER BY F.FactorNo DESC;";
+    sqlQuery = customConfig?.query || "SELECT TOP 100 F.FactorNo AS [شماره فاکتور], F.FactorDate AS [تاریخ فاکتور], C.CustomerName AS [نام خریدار], F.TotalPrice AS [جمع کل ناخالص], F.FinalPrice AS [مبلغ نهایی فاکتور] FROM tblFactor F LEFT JOIN tblCustomer C ON F.CustomerID = C.CustomerID ORDER BY F.FactorNo DESC;";
     resourcePath = "/Factor";
-    reportName = "فاکتورهای فروش سایان";
+    reportName = customConfig?.name || "فاکتورهای فروش سایان";
   } else if (reportKey === "accounting") {
-    sqlQuery = "SELECT TOP 100 D.SanadNo AS [شماره سند], H.SanadDate AS [تاریخ سند], D.DebitAmount AS [بدهکار], D.CreditAmount AS [بستانکار], D.Description AS [شرح سند] FROM tblSanadDetail D LEFT JOIN tblSanadHeader H ON D.SanadID = H.SanadID ORDER BY H.SanadDate DESC, D.SanadNo DESC;";
+    sqlQuery = customConfig?.query || "SELECT TOP 100 D.SanadNo AS [شماره سند], H.SanadDate AS [تاریخ سند], D.DebitAmount AS [بدهکار], D.CreditAmount AS [بستانکار], D.Description AS [شرح سند] FROM tblSanadDetail D LEFT JOIN tblSanadHeader H ON D.SanadID = H.SanadID ORDER BY H.SanadDate DESC, D.SanadNo DESC;";
     resourcePath = "/BurVoucher";
-    reportName = "اسناد حسابداری (دفتر روزنامه)";
+    reportName = customConfig?.name || "اسناد حسابداری (دفتر روزنامه)";
   } else {
     return res.status(400).json({ error: "گزارش درخواستی وجود ندارد" });
   }

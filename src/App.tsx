@@ -99,6 +99,42 @@ export default function App() {
   } | null>(null);
   const [discoveryLoading, setDiscoveryLoading] = useState(false);
 
+  // BI Query Config state
+  const [biConfigMap, setBiConfigMap] = useState<any>({});
+  const [editingBiConfig, setEditingBiConfig] = useState<boolean>(false);
+  const [tempBiQuery, setTempBiQuery] = useState<string>("");
+
+  const loadBiConfig = async () => {
+    try {
+      const data = await fetchJson("/api/gateway/biconfig");
+      if (data && typeof data === 'object' && !data.error) {
+        setBiConfigMap(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const saveBiConfig = async () => {
+    try {
+      setBiLoading(true);
+      const res = await fetch("/api/gateway/biconfig", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reportKey: selectedBiReport, query: tempBiQuery })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setBiConfigMap(data.biConfig);
+        setEditingBiConfig(false);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBiLoading(false);
+    }
+  };
+
   // Helper to fetch JSON safely verifying content type to prevent non-JSON/HTML crashes
   const fetchJson = async (url: string) => {
     try {
@@ -162,6 +198,8 @@ export default function App() {
       } else {
         setDiscoveryData(null);
       }
+
+      await loadBiConfig();
 
       // Fetch Config
       const configData = await fetchJson("/api/gateway/config");
@@ -937,8 +975,58 @@ export default function App() {
                         )}
                         <span>واکشی مستقیم از دیتابیس سایان (Real Run)</span>
                       </button>
+                      <button
+                        onClick={() => {
+                          setTempBiQuery(biConfigMap[selectedBiReport]?.query || "");
+                          setEditingBiConfig(!editingBiConfig);
+                        }}
+                        className="p-2 bg-[#27272a] hover:bg-[#3f3f46] rounded border border-[#3f3f46] transition-colors text-white"
+                        title="ویرایش دستی کوئری SQL"
+                      >
+                        <Settings className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
+
+                  {/* Edit BI Config Area */}
+                  {editingBiConfig && (
+                    <div className="bg-[#18181b] border border-[#27272a] rounded-lg p-4 space-y-3 mt-2">
+                       <h5 className="text-[11px] text-white font-bold flex items-center gap-2">
+                         <Terminal className="w-4 h-4 text-emerald-400" />
+                         <span>شخصی‌سازی کوئری SQL برای گزارش جاری</span>
+                       </h5>
+                       <p className="text-[10px] text-[#a1a1aa] leading-relaxed">
+                         در صورتی که جداول دیتابیس شما نام‌های متفاوتی (مانند `ACT_TBL_001`) دارند، کوئری استاندارد پایین را متناسب با دیتابیس خود بازنویسی کنید. اگر کوئری سفارشی ذخیره شود، سیستم به جای کوئری پیش‌فرض از آن استفاده خواهد کرد.
+                       </p>
+                       <textarea
+                         value={tempBiQuery}
+                         onChange={(e) => setTempBiQuery(e.target.value)}
+                         placeholder="SELECT TOP 100 ... FROM ACT_TBL_xyz"
+                         className="w-full bg-[#09090b] border border-[#27272a] rounded p-3 text-xs text-[#e4e4e7] font-mono outline-none focus:border-blue-500 text-left min-h-[120px]"
+                         dir="ltr"
+                       />
+                       <div className="flex gap-2">
+                         <button
+                           onClick={saveBiConfig}
+                           disabled={biLoading || !tempBiQuery.trim()}
+                           className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded text-[11px] text-white font-bold flex items-center gap-2"
+                         >
+                           <Save className="w-3 h-3" />
+                           <span>ذخیره کوئری سفارشی</span>
+                         </button>
+                         <button
+                           onClick={() => {
+                             setTempBiQuery("");
+                             saveBiConfig(); // Save empty to revert to default
+                           }}
+                           className="px-4 py-2 bg-rose-600 hover:bg-rose-500 rounded text-[11px] text-white font-bold flex items-center gap-2"
+                         >
+                           <Trash className="w-3 h-3" />
+                           <span>حذف سفارشی و بازگشت به پیش‌فرض</span>
+                         </button>
+                       </div>
+                    </div>
+                  )}
 
                   {/* BI Result Display Grid */}
                   <div className="space-y-4 pt-1">
@@ -978,6 +1066,21 @@ export default function App() {
                         <pre className="p-3 bg-[#09090b] rounded border border-rose-950/40 text-[10.5px] text-rose-300 leading-relaxed overflow-x-auto whitespace-pre-wrap font-mono">
                           {biResult.error}
                         </pre>
+
+                        {biResult.hint && (
+                          <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-3 text-blue-300 text-[10.5px] leading-relaxed mt-2" dir="rtl">
+                            <strong className="block mb-1 text-blue-400">💡 راهنمای سرور:</strong>
+                            {biResult.hint}
+                          </div>
+                        )}
+                        
+                        {biResult.tables_found && (
+                          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-md p-3 text-emerald-300 text-[10.5px] leading-relaxed mt-2" dir="ltr">
+                            <strong className="block mb-2 text-emerald-400 text-right" dir="rtl">📋 جداول موجود در دیتابیس فعلی:</strong>
+                            <div className="max-h-32 overflow-y-auto font-mono opacity-80 break-words">{biResult.tables_found}</div>
+                            <p className="mt-2 text-right text-[10px] text-emerald-400" dir="rtl">اگر جدول مورد نیاز شما در اینجا نیست، از سربرگ <b>مدیریت سرور سایان</b>، در کادر کشف خودکار، دیتابیس صحیح را انتخاب کنید.</p>
+                          </div>
+                        )}
 
                         <div className="bg-rose-500/10 p-3 rounded-lg border border-rose-500/10 text-[10.5px] text-rose-300/90 leading-relaxed md:grid md:grid-cols-2 md:gap-4 space-y-2 md:space-y-0 font-medium">
                           <div className="space-y-1">
