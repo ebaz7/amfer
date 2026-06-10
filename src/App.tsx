@@ -1505,26 +1505,31 @@ export default function App() {
                   {/* Step 2 */}
                   <div className="bg-[#18181b] border border-[#27272a] rounded-xl p-4 space-y-2">
                     <span className="text-[10px] font-mono text-blue-400 font-bold uppercase tracking-wider block">گام دوم</span>
-                    <h3 className="text-xs font-semibold text-white">۲. ایجاد دایرکتوری و آماده‌سازی فایل‌های هسته</h3>
+                    <h3 className="text-xs font-semibold text-white">۲. انتقال فایل‌های پروژه به سرور سایان</h3>
                     <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
-                      یک فولدر خالی تحت عنوان <code className="text-blue-300 bg-[#09090b] px-1 py-0.5 rounded text-[10.5px]">sayan-api-gateway</code> بسازید. فایل‌های <code className="text-white">package.json</code> و کدهای سرور <code className="text-white">server.ts / server.js</code> پروژه فعلی را کپی کرده و در این فولدر جدید قرار دهید.
+                      ابتدا کل پروژه را به صورت یک فایل فشرده (ZIP) از منوی تنظیمات بالای سیستم دانلود کرده و محتویات آن را درون یک پوشه به نام <code className="text-blue-300 bg-[#09090b] px-1 py-0.5 rounded text-[10.5px]">C:\sayan-gateway-management-panel</code> بر روی هارد دیسک سرور کپی و استخراج (Extract) کنید تا فایل‌های <code className="text-white">package.json</code>, <code className="text-white">server.ts</code> و دایرکتوری <code className="text-white">src</code> در این آدرس قرار گیرند.
                     </p>
                   </div>
 
                   {/* Step 3 */}
                   <div className="bg-[#18181b] border border-[#27272a] rounded-xl p-4 space-y-2">
                     <span className="text-[10px] font-mono text-blue-400 font-bold uppercase tracking-wider block">گام سوم</span>
-                    <h3 className="text-xs font-semibold text-white">۳. نصب پکیج‌های پیش‌نیاز رابط دیتابیس ام‌اس‌اس‌کیوال (CMD)</h3>
+                    <h3 className="text-xs font-semibold text-white">۳. نصب پیش‌نیازها و کامپایل کل پروژه</h3>
                     <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
-                      ترمینال CMD یا PowerShell را باز کرده، با وارد کردن دستور cd به دایرکتوری ایجاد شده بروید و پکیج‌های مورد نیاز اتصال را نصب کنید:
+                      ترمینال خط فرمان CMD یا PowerShell را باز کرده، مقتضی است مسیر ترمینال را به فولدر برنامه تغییر دهید و سپس با زدن دستور نصب و بیلد، کدهای تایپ‌اسکریپت و کلاینت ری‌اکت را به صورت جامع بیلد نمایید:
                     </p>
                     
                     <div className="space-y-1.5 text-left font-mono text-[11px]" dir="ltr">
                       <div className="p-2.5 bg-[#09090b] text-emerald-400 rounded border border-[#27272a] select-all">
-                        cd C:\sayan-api-gateway
+                        cd C:\sayan-gateway-management-panel
                       </div>
                       <div className="p-2.5 bg-[#09090b] text-emerald-400 rounded border border-[#27272a] select-all">
-                        npm install express mssql cors dotenv
+                        # ۱. نصب کلیه پکیج‌ها و مترجم‌های پیش‌فرض
+                        npm install
+                      </div>
+                      <div className="p-2.5 bg-[#09090b] text-blue-400 rounded border border-[#27272a] select-all">
+                        # ۲. کامپایل کدهای پروژه و فرانت‌اند به جاوااسکریپت بهینه‌شده
+                        npm run build
                       </div>
                     </div>
                   </div>
@@ -1532,12 +1537,12 @@ export default function App() {
                   {/* Step 4 */}
                   <div className="bg-[#18181b] border border-[#27272a] rounded-xl p-4 space-y-2">
                     <span className="text-[10px] font-mono text-blue-400 font-bold uppercase tracking-wider block">گام چهارم</span>
-                    <h3 className="text-xs font-semibold text-white">۴. اجرای دروازه واسط و شروع سرویس‌دهی</h3>
+                    <h3 className="text-xs font-semibold text-white">۴. اجرای دروازه واسط و پنل مدیریت زنده</h3>
                     <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
-                      برای اجرای وب‌سرور میانی بر روی پورت پیش‌فرض (3000)، دستور زیر را در خط فرمان سرور تایپ کنید:
+                      پس از اتمام موفقیت‌آمیز کامپایل در گام قبل، یک فایل فوق سریع سر هم شده به آدرس <code className="text-white">dist/server.cjs</code> ایجاد می‌شود که همزمان وب‌سرویس و پنل مدیریت را میزبانی خواهد کرد. برای اجرا دستور زیر را وارد کنید:
                     </p>
                     <div className="bg-[#09090b] p-2.5 rounded font-mono text-[11px] text-left text-emerald-400 border border-[#27272a] select-all" dir="ltr">
-                      node server.js
+                      node dist/server.cjs
                     </div>
 
                     <div className="pt-2">
@@ -1545,20 +1550,20 @@ export default function App() {
                         🔒 تغییر پورت خروجی به پورت دلخواه (مثلاً 5000):
                       </p>
                       <p className="text-[10px] text-[#a1a1aa] mb-1.5 leading-relaxed">
-                        اگر پورت 3000 توسطبرنامه‌ای دیگر اشغال است، می‌توانید با ست کردن متغیر محیطی <code className="text-white">PORT</code> قبل از اجرا، پورت دلخواه را تنظیم کنید:
+                        اگر پورت 3000 توسط برنامه‌ای دیگر اشغال است، می‌توانید با ست کردن متغیر محیطی <code className="text-white">PORT</code> قبل از اجرا، پورت دلخواه را تنظیم کنید:
                       </p>
                       <div className="space-y-1 text-left font-mono text-[10px]" dir="ltr">
                         <div className="bg-[#09090b] p-1.5 rounded text-blue-300 border border-[#27272a] select-all">
                           # در محیط Windows (CMD):
-                          set PORT=5000&& node server.js
+                          set PORT=5000&& node dist/server.cjs
                         </div>
                         <div className="bg-[#09090b] p-1.5 rounded text-blue-300 border border-[#27272a] select-all">
                           # در محیط Windows (PowerShell):
-                          $env:PORT=5000; node server.js
+                          $env:PORT=5000; node dist/server.cjs
                         </div>
                         <div className="bg-[#09090b] p-1.5 rounded text-blue-300 border border-[#27272a] select-all">
                           # در محیط Linux:
-                          PORT=5000 node server.js
+                          PORT=5000 node dist/server.cjs
                         </div>
                       </div>
                     </div>
@@ -1582,12 +1587,12 @@ export default function App() {
                         npm install -g pm2
                       </div>
                       <div className="p-2.5 bg-[#09090b] text-emerald-400 rounded border border-[#27272a] select-all">
-                        # اجرا با پورت پیش‌فرض 3000
-                        pm2 start server.js --name "sayan-api"
+                        # اجرا با پورت پیش‌فرض 3000 از فایل کامپایل شده
+                        pm2 start dist/server.cjs --name "sayan-api"
                       </div>
                       <div className="p-2.5 bg-[#09090b] text-amber-400 rounded border border-[#27272a] select-all">
                         # اجرا با پورت سفارشی (مثلاً 5000) به صورت همیشگی
-                        pm2 start server.js --name "sayan-api" --env PORT=5000
+                        pm2 start dist/server.cjs --name "sayan-api" --env PORT=5000
                       </div>
                       <div className="p-2.5 bg-[#09090b] text-blue-400 rounded border border-[#27272a] select-all">
                         pm2 save
@@ -1600,21 +1605,21 @@ export default function App() {
                     <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider block">گام ششم</span>
                     <h3 className="text-xs font-semibold text-white">۶. دستورات اعمال آپدیت و تغییرات روی سرور حسابداری</h3>
                     <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
-                      زمانی که کد جدید یا تغییراتی در فایل‌های کانفیگ/کدهای سرور (<code className="text-white">server.js</code> یا تنظیمات دیگر) اعمال می‌کنید، برای به‌روزرسانی سرویس زنده بدون نیاز به ریبوت و خاموشی کل سیستم، دستورات زیر را وارد کنید:
+                      زمانی که کد جدید یا تغییراتی در کدهای سرور یا تنظیمات دیگر اعمال می‌کنید، برای به‌روزرسانی سرویس با بازنویسی فایل‌ها، ابتدا پروژه را مجدداً بیلد (Build) کرده و سپس پروسه PM2 را طبق دستور زیر ریلود کنید تا تغییرات فوراً و بدون قطعی اعمال شوند:
                     </p>
                     
                     <div className="space-y-1.5 text-left font-mono text-[11px]" dir="ltr">
                       <div className="p-2.5 bg-[#09090b] text-amber-400 rounded border border-[#27272a] select-all">
-                        # ۱. رفتن به مسیر نصب
-                        cd C:\sayan-api-gateway
+                        # ۱. رفتن به مسیر نصب پروژه
+                        cd C:\sayan-gateway-management-panel
+                      </div>
+                      <div className="p-2.5 bg-[#09090b] text-blue-400 rounded border border-[#27272a] select-all">
+                        # ۲. نصب هرگونه متعلقات جدید و کامپایل دوباره خروجی‌ها
+                        npm install && npm run build
                       </div>
                       <div className="p-2.5 bg-[#09090b] text-emerald-400 rounded border border-[#27272a] select-all">
-                        # ۲. کپی کردن فایل‌های جدید روی سرور (سپس بارگذاری مجدد پردازش در PM2)
+                        # ۳. بارگذاری مجدد پردازش زنده در چند میلی‌ثانیه بدون قطعی پورت
                         pm2 reload sayan-api
-                      </div>
-                      <div className="p-2.5 bg-[#09090b] text-slate-300 rounded border border-[#27272a] select-all">
-                        # مشاهده وضعیت زنده و لاشه‌های آپدیت شده سرور
-                        pm2 status
                       </div>
                     </div>
                   </div>
@@ -1641,7 +1646,7 @@ export default function App() {
                         pm2 save
                       </div>
                       <div className="p-2.5 bg-[#09090b] text-emerald-400 rounded border border-[#27272a] select-all">
-                        # ۴. سپس می‌توانید کل پوشه C:\sayan-api-gateway را به سادگی حذف کنید.
+                        # ۴. سپس می‌توانید کل پوشه C:\sayan-gateway-management-panel را به سادگی حذف کنید.
                       </div>
                     </div>
                   </div>
