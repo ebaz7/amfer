@@ -1534,14 +1534,38 @@ export default function App() {
                     <span className="text-[10px] font-mono text-blue-400 font-bold uppercase tracking-wider block">گام چهارم</span>
                     <h3 className="text-xs font-semibold text-white">۴. اجرای دروازه واسط و شروع سرویس‌دهی</h3>
                     <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
-                      برای اجرای وب‌سرور میانی، دستور زیر را در خط فرمان سرور تایپ کنید:
+                      برای اجرای وب‌سرور میانی بر روی پورت پیش‌فرض (3000)، دستور زیر را در خط فرمان سرور تایپ کنید:
                     </p>
                     <div className="bg-[#09090b] p-2.5 rounded font-mono text-[11px] text-left text-emerald-400 border border-[#27272a] select-all" dir="ltr">
                       node server.js
                     </div>
-                    <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/15 text-emerald-400 text-[11px] rounded flex items-center gap-2">
+
+                    <div className="pt-2">
+                      <p className="text-[11px] text-amber-400 font-semibold mb-1">
+                        🔒 تغییر پورت خروجی به پورت دلخواه (مثلاً 5000):
+                      </p>
+                      <p className="text-[10px] text-[#a1a1aa] mb-1.5 leading-relaxed">
+                        اگر پورت 3000 توسطبرنامه‌ای دیگر اشغال است، می‌توانید با ست کردن متغیر محیطی <code className="text-white">PORT</code> قبل از اجرا، پورت دلخواه را تنظیم کنید:
+                      </p>
+                      <div className="space-y-1 text-left font-mono text-[10px]" dir="ltr">
+                        <div className="bg-[#09090b] p-1.5 rounded text-blue-300 border border-[#27272a] select-all">
+                          # در محیط Windows (CMD):
+                          set PORT=5000&& node server.js
+                        </div>
+                        <div className="bg-[#09090b] p-1.5 rounded text-blue-300 border border-[#27272a] select-all">
+                          # در محیط Windows (PowerShell):
+                          $env:PORT=5000; node server.js
+                        </div>
+                        <div className="bg-[#09090b] p-1.5 rounded text-blue-300 border border-[#27272a] select-all">
+                          # در محیط Linux:
+                          PORT=5000 node server.js
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/15 text-emerald-400 text-[11px] rounded flex items-center gap-2 mt-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>پیام موفقیت: <code className="font-bold text-white bg-[#09090b] px-1.5 py-0.5 rounded font-mono">[Sayan Gateway] Server running at http://localhost:3000</code> در ترمینال سرور درج می‌شود.</span>
+                      <span>پیام موفقیت: <code className="font-bold text-white bg-[#09090b] px-1.5 py-0.5 rounded font-mono">[Sayan Gateway] Server running at http://localhost:[PORT]</code> در ترمینال سرور درج می‌شود.</span>
                     </div>
                   </div>
 
@@ -1558,7 +1582,66 @@ export default function App() {
                         npm install -g pm2
                       </div>
                       <div className="p-2.5 bg-[#09090b] text-emerald-400 rounded border border-[#27272a] select-all">
+                        # اجرا با پورت پیش‌فرض 3000
                         pm2 start server.js --name "sayan-api"
+                      </div>
+                      <div className="p-2.5 bg-[#09090b] text-amber-400 rounded border border-[#27272a] select-all">
+                        # اجرا با پورت سفارشی (مثلاً 5000) به صورت همیشگی
+                        pm2 start server.js --name "sayan-api" --env PORT=5000
+                      </div>
+                      <div className="p-2.5 bg-[#09090b] text-blue-400 rounded border border-[#27272a] select-all">
+                        pm2 save
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 6 */}
+                  <div className="bg-[#18181b] border border-[#27272a] rounded-xl p-4 space-y-2">
+                    <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider block">گام ششم</span>
+                    <h3 className="text-xs font-semibold text-white">۶. دستورات اعمال آپدیت و تغییرات روی سرور حسابداری</h3>
+                    <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
+                      زمانی که کد جدید یا تغییراتی در فایل‌های کانفیگ/کدهای سرور (<code className="text-white">server.js</code> یا تنظیمات دیگر) اعمال می‌کنید، برای به‌روزرسانی سرویس زنده بدون نیاز به ریبوت و خاموشی کل سیستم، دستورات زیر را وارد کنید:
+                    </p>
+                    
+                    <div className="space-y-1.5 text-left font-mono text-[11px]" dir="ltr">
+                      <div className="p-2.5 bg-[#09090b] text-amber-400 rounded border border-[#27272a] select-all">
+                        # ۱. رفتن به مسیر نصب
+                        cd C:\sayan-api-gateway
+                      </div>
+                      <div className="p-2.5 bg-[#09090b] text-emerald-400 rounded border border-[#27272a] select-all">
+                        # ۲. کپی کردن فایل‌های جدید روی سرور (سپس بارگذاری مجدد پردازش در PM2)
+                        pm2 reload sayan-api
+                      </div>
+                      <div className="p-2.5 bg-[#09090b] text-slate-300 rounded border border-[#27272a] select-all">
+                        # مشاهده وضعیت زنده و لاشه‌های آپدیت شده سرور
+                        pm2 status
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 7 */}
+                  <div className="bg-[#18181b] border border-[#27272a] rounded-xl p-4 space-y-2">
+                    <span className="text-[10px] font-mono text-rose-400 font-bold uppercase tracking-wider block">گام هفتم</span>
+                    <h3 className="text-xs font-semibold text-white">۷. دستور حذف نصب کامل سرویس (Uninstall)</h3>
+                    <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
+                      در صورتی که می‌خواهید سرویس میانی سایان را به طور کامل از روی سرور متوقف، باطل و از پس‌زمینه ویندوز/لینوکس یا رجیستری پروسه‌ها حذف نصب (Uninstall) کنید، دستورات زیر را به ترتیب اجرا نمایید:
+                    </p>
+                    
+                    <div className="space-y-1.5 text-left font-mono text-[11px]" dir="ltr">
+                      <div className="p-2.5 bg-[#09090b] text-rose-400 rounded border border-[#27272a] select-all">
+                        # ۱. متوقف کردن پردازش زنده
+                        pm2 stop sayan-api
+                      </div>
+                      <div className="p-2.5 bg-[#09090b] text-rose-500 rounded border border-[#27272a] select-all">
+                        # ۲. حذف پروسه از لیست مدیریت خودکار سیستم
+                        pm2 delete sayan-api
+                      </div>
+                      <div className="p-2.5 bg-[#09090b] text-slate-400 rounded border border-[#27272a] select-all">
+                        # ۳. ذخیره‌سازی وضعیت خالی لیست پردازش‌ها
+                        pm2 save
+                      </div>
+                      <div className="p-2.5 bg-[#09090b] text-emerald-400 rounded border border-[#27272a] select-all">
+                        # ۴. سپس می‌توانید کل پوشه C:\sayan-api-gateway را به سادگی حذف کنید.
                       </div>
                     </div>
                   </div>
