@@ -62,9 +62,9 @@ export default function App() {
   });
 
   const [localConfig, setLocalConfig] = useState<SayanLocalConfig>({
-    baseUrl: "http://127.0.0.1:5000/api",
+    baseUrl: "http://127.0.0.1:8080/api",
     token: "Bearer ...",
-    useProxy: true
+    useProxy: false
   });
 
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
@@ -1841,7 +1841,7 @@ export default function App() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1 sm:col-span-2">
-                          <label className="text-[11px] text-[#a1a1aa]">آدرس وب‌سرویس سایان روی سرور (Local API Base URL):</label>
+                          <label className="text-[11px] text-[#a1a1aa] font-bold text-red-400">آدرس وب‌سرویس اصلی نرم‌افزار سایان (نه آدرس این پنل!):</label>
                           <input
                             type="text"
                             required
@@ -1850,6 +1850,9 @@ export default function App() {
                             className="w-full bg-[#09090b] border border-[#27272a] rounded p-2 text-xs text-[#e4e4e7] font-mono outline-none focus:border-blue-500 text-left"
                             dir="ltr"
                           />
+                          <p className="text-[10px] text-gray-500 mt-1">
+                            نکته: این پنل مانند یک واسط عمل می‌کند. اگر سایان روی پورت دیگری وب‌سرویس می‌دهد، آن را وارد کنید. اگر نه، تیک پراکسی را خاموش کنید تا فقط از SQL استفاده شود.
+                          </p>
                         </div>
 
                         <div className="space-y-1 sm:col-span-2">

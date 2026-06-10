@@ -674,6 +674,12 @@ app.get("/api/gateway/reports/:reportKey", async (req, res) => {
       console.warn(`Direct SQL query failed for report: ${reportName}`, err.message);
       sqlFailed = true;
       sqlErrorMsg = err.message;
+      
+      let dbTables = "";
+      try {
+        const tablesResult = await sqlPool.request().query("SELECT TOP 30 TABLE_NAME, TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' ORDER BY TABLE_NAME;");
+        dbTables = tablesResult.recordset.map((r: any) => `${r.TABLE_SCHEMA}.${r.TABLE_NAME}`).join(", ");
+      } catch (e) {}
 
       const responseTime = Date.now() - start;
       const newLog: LogEntry = {
@@ -696,8 +702,9 @@ app.get("/api/gateway/reports/:reportKey", async (req, res) => {
         success: false,
         source: "sql-direct",
         error: `خطای اس‌کیوال دیتابیس: ${err.message}`,
-        hint: "نام جداول یا ستون‌ها ممکن است با کوئری پیش‌فرض سیستم مطابقت نداشته باشد، یا کاربر دیتابیس سطح دسترسی خواندن جداول را ندارد.",
-        responseTime
+        hint: `نام جداول یا ستون‌ها ممکن است با کوئری پیش‌فرض سیستم مطابقت نداشته باشد، یا دیتابیس اشتباهی متصل شده است. لیست جداول دیتابیس فعلی: ${dbTables}`,
+        responseTime,
+        tables_found: dbTables
       });
     }
   }
@@ -1188,12 +1195,20 @@ app.post("/api/gateway/query/test", async (req, res) => {
       };
       storage.logs.unshift(newLog);
       saveStorage(storage);
+      
+      let dbTables = "";
+      try {
+        const tablesResult = await sqlPool.request().query("SELECT TOP 30 TABLE_NAME, TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' ORDER BY TABLE_NAME;");
+        dbTables = tablesResult.recordset.map((r: any) => `${r.TABLE_SCHEMA}.${r.TABLE_NAME}`).join(", ");
+      } catch (e) {}
 
       return res.status(500).json({
         success: false,
         error: err.message,
+        source: "sql-direct",
         responseTime,
-        hint: `خطای پایگاه داده: ${err.message}. املاء کوئری را بررسی کرده و مطمئن شوید جداول انتخابی وجود دارند.`
+        hint: `خطای پایگاه داده: ${err.message}. جداول این دیتابیس: ${dbTables}`,
+        tables_found: dbTables
       });
     }
   } else {
